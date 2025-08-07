@@ -2,11 +2,13 @@ import { useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
-import { Menu, User, Heart, Search, Home } from 'lucide-react';
+import { useAuth } from '@/hooks/useAuth';
+import { Menu, User, Heart, Search, Home, LogOut } from 'lucide-react';
 
 const Header = () => {
   const [isOpen, setIsOpen] = useState(false);
   const location = useLocation();
+  const { user, signOut } = useAuth();
 
   const navigation = [
     { name: 'Buy', href: '/properties', icon: Search },
@@ -56,12 +58,26 @@ const Header = () => {
               Favorites
             </Link>
           </Button>
-          <Button variant="outline" size="sm" asChild>
-            <Link to="/login">Sign In</Link>
-          </Button>
-          <Button size="sm" asChild>
-            <Link to="/register">Get Started</Link>
-          </Button>
+          {user ? (
+            <>
+              <span className="text-sm text-muted-foreground">
+                Welcome, {user.email}
+              </span>
+              <Button variant="outline" size="sm" onClick={signOut}>
+                <LogOut className="h-4 w-4 mr-2" />
+                Sign Out
+              </Button>
+            </>
+          ) : (
+            <>
+              <Button variant="outline" size="sm" asChild>
+                <Link to="/auth">Sign In</Link>
+              </Button>
+              <Button size="sm" asChild>
+                <Link to="/auth">Get Started</Link>
+              </Button>
+            </>
+          )}
         </div>
 
         {/* Mobile Menu */}
@@ -108,12 +124,26 @@ const Header = () => {
                     Favorites
                   </Link>
                 </Button>
-                <Button variant="outline" asChild>
-                  <Link to="/login" onClick={() => setIsOpen(false)}>Sign In</Link>
-                </Button>
-                <Button asChild>
-                  <Link to="/register" onClick={() => setIsOpen(false)}>Get Started</Link>
-                </Button>
+                {user ? (
+                  <>
+                    <div className="px-2 py-1 text-sm text-muted-foreground">
+                      Welcome, {user.email}
+                    </div>
+                    <Button variant="outline" onClick={() => { signOut(); setIsOpen(false); }}>
+                      <LogOut className="h-4 w-4 mr-2" />
+                      Sign Out
+                    </Button>
+                  </>
+                ) : (
+                  <>
+                    <Button variant="outline" asChild>
+                      <Link to="/auth" onClick={() => setIsOpen(false)}>Sign In</Link>
+                    </Button>
+                    <Button asChild>
+                      <Link to="/auth" onClick={() => setIsOpen(false)}>Get Started</Link>
+                    </Button>
+                  </>
+                )}
               </div>
             </div>
           </SheetContent>

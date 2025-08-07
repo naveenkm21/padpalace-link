@@ -10,7 +10,7 @@ import {
   Square, 
   Phone, 
   Mail,
-  Eye
+  User
 } from 'lucide-react';
 import { useState } from 'react';
 
@@ -104,7 +104,7 @@ const PropertyCard = ({ property, onFavorite, isFavorited = false }: PropertyCar
         </Badge>
 
         {/* Featured Badge */}
-        {property.isFeatured && (
+        {property.is_featured && (
           <Badge className="absolute top-3 right-12 bg-accent text-accent-foreground">
             Featured
           </Badge>
@@ -122,11 +122,7 @@ const PropertyCard = ({ property, onFavorite, isFavorited = false }: PropertyCar
           <Heart className={`h-4 w-4 ${isFavorited ? 'fill-current' : ''}`} />
         </Button>
 
-        {/* Views Counter */}
-        <div className="absolute bottom-3 right-3 flex items-center space-x-1 bg-black/50 text-white px-2 py-1 rounded text-xs">
-          <Eye className="h-3 w-3" />
-          <span>{property.views}</span>
-        </div>
+        {/* Views Counter - Removed since not in new schema */}
       </div>
 
       <CardContent className="p-6">
@@ -144,7 +140,7 @@ const PropertyCard = ({ property, onFavorite, isFavorited = false }: PropertyCar
         <div className="flex items-center text-muted-foreground mb-4">
           <MapPin className="h-4 w-4 mr-1" />
           <span className="text-sm">
-            {property.location.city}, {property.location.state}
+            {property.city}, {property.state}
           </span>
         </div>
 
@@ -159,35 +155,37 @@ const PropertyCard = ({ property, onFavorite, isFavorited = false }: PropertyCar
               <Bath className="h-4 w-4 mr-1" />
               <span>{property.bathrooms}</span>
             </div>
-            <div className="flex items-center">
-              <Square className="h-4 w-4 mr-1" />
-              <span>{property.squareFeet.toLocaleString()} sq ft</span>
-            </div>
+            {property.square_feet && (
+              <div className="flex items-center">
+                <Square className="h-4 w-4 mr-1" />
+                <span>{property.square_feet.toLocaleString()} sq ft</span>
+              </div>
+            )}
           </div>
         </div>
 
         {/* Agent Info */}
-        <div className="flex items-center justify-between pt-4 border-t">
-          <div className="flex items-center space-x-3">
-            <img
-              src={property.agent.avatar}
-              alt={property.agent.name}
-              className="w-8 h-8 rounded-full object-cover"
-            />
-            <div>
-              <div className="text-sm font-medium">{property.agent.name}</div>
+        {property.profiles && (
+          <div className="flex items-center justify-between pt-4 border-t">
+            <div className="flex items-center space-x-3">
+              <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center">
+                <User className="h-4 w-4 text-primary" />
+              </div>
+              <div>
+                <div className="text-sm font-medium">{property.profiles.full_name || 'Agent'}</div>
+              </div>
+            </div>
+          
+            <div className="flex items-center space-x-2">
+              <Button variant="ghost" size="sm" className="w-8 h-8 p-0">
+                <Phone className="h-4 w-4" />
+              </Button>
+              <Button variant="ghost" size="sm" className="w-8 h-8 p-0">
+                <Mail className="h-4 w-4" />
+              </Button>
             </div>
           </div>
-          
-          <div className="flex items-center space-x-2">
-            <Button variant="ghost" size="sm" className="w-8 h-8 p-0">
-              <Phone className="h-4 w-4" />
-            </Button>
-            <Button variant="ghost" size="sm" className="w-8 h-8 p-0">
-              <Mail className="h-4 w-4" />
-            </Button>
-          </div>
-        </div>
+        )}
       </CardContent>
     </Card>
   );

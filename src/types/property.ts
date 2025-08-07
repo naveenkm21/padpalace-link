@@ -1,48 +1,39 @@
 export interface Property {
   id: string;
   title: string;
-  description: string;
+  description: string | null;
   price: number;
-  location: {
-    address: string;
-    city: string;
-    state: string;
-    zipCode: string;
-    lat?: number;
-    lng?: number;
-  };
-  type: 'house' | 'apartment' | 'condo' | 'townhouse' | 'land';
-  status: 'for-sale' | 'for-rent' | 'sold' | 'rented';
-  bedrooms: number;
-  bathrooms: number;
-  squareFeet: number;
-  yearBuilt?: number;
-  lotSize?: number;
-  features: string[];
+  property_type: string;
+  bedrooms: number | null;
+  bathrooms: number | null;
+  square_feet: number | null;
+  address: string;
+  city: string;
+  state: string;
+  zip_code: string | null;
+  latitude: number | null;
+  longitude: number | null;
   images: string[];
-  agent: {
-    id: string;
-    name: string;
-    phone: string;
-    email: string;
-    avatar?: string;
+  status: string;
+  is_featured: boolean;
+  agent_id: string | null;
+  created_at: string;
+  updated_at: string;
+  profiles?: {
+    full_name: string | null;
+    phone: string | null;
   };
-  createdAt: string;
-  updatedAt: string;
-  views: number;
-  isFeatured: boolean;
 }
 
 export interface SearchFilters {
   minPrice?: number;
   maxPrice?: number;
   location?: string;
-  propertyType?: Property['type'];
+  propertyType?: string;
   minBedrooms?: number;
   minBathrooms?: number;
   minSquareFeet?: number;
   maxSquareFeet?: number;
-  features?: string[];
 }
 
 export interface User {

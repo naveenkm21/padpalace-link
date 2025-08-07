@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import Header from '@/components/layout/Header';
 import Footer from '@/components/layout/Footer';
@@ -8,25 +8,54 @@ import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { mockProperties } from '@/data/mockProperties';
+import { supabase } from '@/integrations/supabase/client';
 import { Property, SearchFilters } from '@/types/property';
 import { Search, Filter, Grid, List, SlidersHorizontal } from 'lucide-react';
 
 const Properties = () => {
+  const [properties, setProperties] = useState<Property[]>([]);
+  const [loading, setLoading] = useState(true);
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
   const [searchFilters, setSearchFilters] = useState<SearchFilters>({});
   const [sortBy, setSortBy] = useState<'price-asc' | 'price-desc' | 'newest' | 'oldest'>('newest');
   const [favorites, setFavorites] = useState<string[]>([]);
 
+  useEffect(() => {
+    fetchProperties();
+  }, []);
+
+  const fetchProperties = async () => {
+    try {
+      const { data, error } = await supabase
+        .from('properties')
+        .select(`
+          *,
+          profiles (
+            full_name,
+            phone
+          )
+        `)
+        .eq('status', 'active')
+        .order('created_at', { ascending: false });
+
+      if (error) throw error;
+      setProperties(data || []);
+    } catch (error) {
+      console.error('Error fetching properties:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const filteredAndSortedProperties = useMemo(() => {
-    let filtered = mockProperties.filter((property) => {
+    let filtered = properties.filter((property) => {
       // Location filter
       if (searchFilters.location) {
         const location = searchFilters.location.toLowerCase();
         const matchesLocation = 
-          property.location.city.toLowerCase().includes(location) ||
-          property.location.state.toLowerCase().includes(location) ||
-          property.location.address.toLowerCase().includes(location);
+          property.city.toLowerCase().includes(location) ||
+          property.state.toLowerCase().includes(location) ||
+          property.address.toLowerCase().includes(location);
         if (!matchesLocation) return false;
       }
 
@@ -35,13 +64,13 @@ const Properties = () => {
       if (searchFilters.maxPrice && property.price > searchFilters.maxPrice) return false;
 
       // Property type filter
-      if (searchFilters.propertyType && property.type !== searchFilters.propertyType) return false;
+      if (searchFilters.propertyType && property.property_type !== searchFilters.propertyType) return false;
 
       // Bedrooms filter
-      if (searchFilters.minBedrooms && property.bedrooms < searchFilters.minBedrooms) return false;
+      if (searchFilters.minBedrooms && (!property.bedrooms || property.bedrooms < searchFilters.minBedrooms)) return false;
 
       // Bathrooms filter
-      if (searchFilters.minBathrooms && property.bathrooms < searchFilters.minBathrooms) return false;
+      if (searchFilters.minBathrooms && (!property.bathrooms || property.bathrooms < searchFilters.minBathrooms)) return false;
 
       return true;
     });
@@ -54,15 +83,15 @@ const Properties = () => {
         case 'price-desc':
           return b.price - a.price;
         case 'oldest':
-          return new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime();
+          return new Date(a.created_at).getTime() - new Date(b.created_at).getTime();
         case 'newest':
         default:
-          return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
+          return new Date(b.created_at).getTime() - new Date(a.created_at).getTime();
       }
     });
 
     return filtered;
-  }, [searchFilters, sortBy]);
+  }, [properties, searchFilters, sortBy]);
 
   const handleFavorite = (propertyId: string) => {
     setFavorites(prev => 
@@ -77,6 +106,25 @@ const Properties = () => {
   };
 
   const activeFiltersCount = Object.values(searchFilters).filter(Boolean).length;
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-background">
+        <Header />
+        <div className="container mx-auto px-4 py-8">
+          <div className="animate-pulse space-y-4">
+            <div className="h-8 bg-muted rounded w-1/4"></div>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {[...Array(9)].map((_, i) => (
+                <div key={i} className="h-96 bg-muted rounded-lg"></div>
+              ))}
+            </div>
+          </div>
+        </div>
+        <Footer />
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-background">
@@ -106,16 +154,16 @@ const Properties = () => {
               
               <Select 
                 value={searchFilters.propertyType || ''} 
-                onValueChange={(value) => setSearchFilters(prev => ({ ...prev, propertyType: value as Property['type'] }))}
+                onValueChange={(value) => setSearchFilters(prev => ({ ...prev, propertyType: value }))}
               >
                 <SelectTrigger>
                   <SelectValue placeholder="Property Type" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="house">House</SelectItem>
-                  <SelectItem value="apartment">Apartment</SelectItem>
-                  <SelectItem value="condo">Condo</SelectItem>
-                  <SelectItem value="townhouse">Townhouse</SelectItem>
+                  <SelectItem value="House">House</SelectItem>
+                  <SelectItem value="Condo">Condo</SelectItem>
+                  <SelectItem value="Apartment">Apartment</SelectItem>
+                  <SelectItem value="Townhouse">Townhouse</SelectItem>
                 </SelectContent>
               </Select>
 
