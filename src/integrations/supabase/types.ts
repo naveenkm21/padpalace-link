@@ -7,7 +7,7 @@ export type Json =
   | Json[]
 
 export type Database = {
-  // Allows to automatically instanciate createClient with right options
+  // Allows to automatically instantiate createClient with right options
   // instead of createClient<Database, { PostgrestVersion: 'XX' }>(URL, KEY)
   __InternalSupabase: {
     PostgrestVersion: "13.0.4"
@@ -46,30 +46,45 @@ export type Database = {
       profiles: {
         Row: {
           avatar_url: string | null
+          business_name: string | null
           created_at: string
           full_name: string | null
           id: string
+          license_number: string | null
           phone: string | null
+          service_areas: string[] | null
+          specializations: string[] | null
           updated_at: string
           user_id: string
+          years_experience: number | null
         }
         Insert: {
           avatar_url?: string | null
+          business_name?: string | null
           created_at?: string
           full_name?: string | null
           id?: string
+          license_number?: string | null
           phone?: string | null
+          service_areas?: string[] | null
+          specializations?: string[] | null
           updated_at?: string
           user_id: string
+          years_experience?: number | null
         }
         Update: {
           avatar_url?: string | null
+          business_name?: string | null
           created_at?: string
           full_name?: string | null
           id?: string
+          license_number?: string | null
           phone?: string | null
+          service_areas?: string[] | null
+          specializations?: string[] | null
           updated_at?: string
           user_id?: string
+          years_experience?: number | null
         }
         Relationships: []
       }
@@ -77,66 +92,87 @@ export type Database = {
         Row: {
           address: string
           agent_id: string | null
+          amenities: string[] | null
           bathrooms: number | null
           bedrooms: number | null
           city: string
           created_at: string
           description: string | null
+          floor_number: number | null
+          furnishing_status: string | null
           id: string
           images: string[] | null
           is_featured: boolean | null
           latitude: number | null
+          listing_type: string | null
           longitude: number | null
+          parking_spaces: number | null
           price: number
+          property_category: string | null
           property_type: string
           square_feet: number | null
           state: string
           status: string | null
           title: string
+          total_floors: number | null
           updated_at: string
           zip_code: string | null
         }
         Insert: {
           address: string
           agent_id?: string | null
+          amenities?: string[] | null
           bathrooms?: number | null
           bedrooms?: number | null
           city: string
           created_at?: string
           description?: string | null
+          floor_number?: number | null
+          furnishing_status?: string | null
           id?: string
           images?: string[] | null
           is_featured?: boolean | null
           latitude?: number | null
+          listing_type?: string | null
           longitude?: number | null
+          parking_spaces?: number | null
           price: number
+          property_category?: string | null
           property_type: string
           square_feet?: number | null
           state: string
           status?: string | null
           title: string
+          total_floors?: number | null
           updated_at?: string
           zip_code?: string | null
         }
         Update: {
           address?: string
           agent_id?: string | null
+          amenities?: string[] | null
           bathrooms?: number | null
           bedrooms?: number | null
           city?: string
           created_at?: string
           description?: string | null
+          floor_number?: number | null
+          furnishing_status?: string | null
           id?: string
           images?: string[] | null
           is_featured?: boolean | null
           latitude?: number | null
+          listing_type?: string | null
           longitude?: number | null
+          parking_spaces?: number | null
           price?: number
+          property_category?: string | null
           property_type?: string
           square_feet?: number | null
           state?: string
           status?: string | null
           title?: string
+          total_floors?: number | null
           updated_at?: string
           zip_code?: string | null
         }
@@ -150,15 +186,42 @@ export type Database = {
           },
         ]
       }
+      user_roles: {
+        Row: {
+          created_at: string
+          id: string
+          role: Database["public"]["Enums"]["user_role"]
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          role?: Database["public"]["Enums"]["user_role"]
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          role?: Database["public"]["Enums"]["user_role"]
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      get_current_user_role: {
+        Args: Record<PropertyKey, never>
+        Returns: string
+      }
     }
     Enums: {
-      [_ in never]: never
+      user_role: "agent" | "buyer_seller"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -285,6 +348,8 @@ export type CompositeTypes<
 
 export const Constants = {
   public: {
-    Enums: {},
+    Enums: {
+      user_role: ["agent", "buyer_seller"],
+    },
   },
 } as const
