@@ -4,6 +4,7 @@ import HeroSection from '@/components/home/HeroSection';
 import FeaturedProperties from '@/components/home/FeaturedProperties';
 import ServicesSection from '@/components/home/ServicesSection';
 import CTASection from '@/components/home/CTASection';
+import ChatBot from '@/components/chatbot/ChatBot';
 
 const Index = () => {
   return (
@@ -16,6 +17,7 @@ const Index = () => {
         <CTASection />
       </main>
       <Footer />
+      <ChatBot />
     </div>
   );
 };

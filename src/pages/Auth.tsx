@@ -1,99 +1,125 @@
-import { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import React, { useState, useEffect } from 'react';
+import { useAuth } from '@/hooks/useAuth';
+import { useNavigate, Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Label } from '@/components/ui/label';
-import { useAuth } from '@/hooks/useAuth';
-import { useToast } from '@/hooks/use-toast';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Home } from 'lucide-react';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { useToast } from '@/components/ui/use-toast';
+import { ArrowLeft, Building2, Users } from 'lucide-react';
+import { supabase } from '@/integrations/supabase/client';
 
 const Auth = () => {
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
+  const [signInEmail, setSignInEmail] = useState('');
+  const [signInPassword, setSignInPassword] = useState('');
+  const [signUpEmail, setSignUpEmail] = useState('');
+  const [signUpPassword, setSignUpPassword] = useState('');
   const [fullName, setFullName] = useState('');
-  const [loading, setLoading] = useState(false);
-  const { signIn, signUp } = useAuth();
-  const { toast } = useToast();
+  const [userRole, setUserRole] = useState<'agent' | 'buyer_seller'>('buyer_seller');
+  const [isSignInLoading, setIsSignInLoading] = useState(false);
+  const [isSignUpLoading, setIsSignUpLoading] = useState(false);
+  
+  const { signIn, signUp, user } = useAuth();
   const navigate = useNavigate();
+  const { toast } = useToast();
+
+  useEffect(() => {
+    document.title = 'Sign In - PropertyHub India';
+    const metaDescription = document.querySelector('meta[name="description"]');
+    if (metaDescription) {
+      metaDescription.setAttribute('content', 'Sign in to PropertyHub India to buy, sell, or rent properties across India');
+    }
+  }, []);
+
+  useEffect(() => {
+    if (user) {
+      navigate('/dashboard');
+    }
+  }, [user, navigate]);
 
   const handleSignIn = async (e: React.FormEvent) => {
     e.preventDefault();
-    setLoading(true);
-    
+    setIsSignInLoading(true);
+
     try {
-      const { error } = await signIn(email, password);
+      const { error } = await signIn(signInEmail, signInPassword);
       if (error) {
         toast({
-          variant: "destructive",
           title: "Error",
-          description: error.message,
+          description: error.message || "Failed to sign in",
+          variant: "destructive",
         });
       } else {
         toast({
-          title: "Success",
-          description: "Signed in successfully!",
+          title: "Welcome back!",
+          description: "You have been signed in successfully",
         });
-        navigate('/');
+        navigate('/dashboard');
       }
     } catch (error) {
       toast({
-        variant: "destructive",
         title: "Error",
         description: "An unexpected error occurred",
+        variant: "destructive",
       });
     } finally {
-      setLoading(false);
+      setIsSignInLoading(false);
     }
   };
 
   const handleSignUp = async (e: React.FormEvent) => {
     e.preventDefault();
-    setLoading(true);
-    
+    setIsSignUpLoading(true);
+
     try {
-      const { error } = await signUp(email, password, fullName);
+      const { error } = await signUp(signUpEmail, signUpPassword, fullName);
       if (error) {
         toast({
-          variant: "destructive",
           title: "Error",
-          description: error.message,
+          description: error.message || "Failed to create account",
+          variant: "destructive",
         });
       } else {
+        // Set user role after successful signup
+        const { data: { user: newUser } } = await supabase.auth.getUser();
+        if (newUser) {
+          await supabase
+            .from('user_roles')
+            .upsert({ user_id: newUser.id, role: userRole });
+        }
+
         toast({
-          title: "Success",
-          description: "Account created! Please check your email to verify your account.",
+          title: "Account created!",
+          description: "Please check your email to verify your account",
         });
       }
     } catch (error) {
       toast({
-        variant: "destructive",
         title: "Error",
         description: "An unexpected error occurred",
+        variant: "destructive",
       });
     } finally {
-      setLoading(false);
+      setIsSignUpLoading(false);
     }
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-primary/20 via-background to-accent/20 flex items-center justify-center p-4">
+    <div className="min-h-screen bg-gradient-hero flex items-center justify-center p-4">
       <div className="w-full max-w-md">
-        <div className="text-center mb-8">
-          <Link to="/" className="inline-flex items-center gap-2 text-primary hover:text-primary/80 transition-colors">
-            <Home className="h-5 w-5" />
-            Back to Home
-          </Link>
-        </div>
-
-        <Card className="shadow-xl border-0 bg-card/95 backdrop-blur-sm">
-          <CardHeader className="text-center pb-4">
-            <CardTitle className="text-2xl font-bold">RealEstate</CardTitle>
-            <p className="text-muted-foreground">Welcome to your real estate journey</p>
+        <Card className="shadow-strong">
+          <CardHeader className="space-y-1 text-center">
+            <CardTitle className="text-2xl bg-gradient-primary bg-clip-text text-transparent">
+              PropertyHub India
+            </CardTitle>
+            <CardDescription>
+              Your trusted partner for Indian real estate
+            </CardDescription>
           </CardHeader>
           <CardContent>
-            <Tabs defaultValue="signin" className="w-full">
+            <Tabs defaultValue="signin" className="space-y-4">
               <TabsList className="grid w-full grid-cols-2">
                 <TabsTrigger value="signin">Sign In</TabsTrigger>
                 <TabsTrigger value="signup">Sign Up</TabsTrigger>
@@ -107,8 +133,8 @@ const Auth = () => {
                       id="signin-email"
                       type="email"
                       placeholder="Enter your email"
-                      value={email}
-                      onChange={(e) => setEmail(e.target.value)}
+                      value={signInEmail}
+                      onChange={(e) => setSignInEmail(e.target.value)}
                       required
                     />
                   </div>
@@ -118,13 +144,17 @@ const Auth = () => {
                       id="signin-password"
                       type="password"
                       placeholder="Enter your password"
-                      value={password}
-                      onChange={(e) => setPassword(e.target.value)}
+                      value={signInPassword}
+                      onChange={(e) => setSignInPassword(e.target.value)}
                       required
                     />
                   </div>
-                  <Button type="submit" className="w-full" disabled={loading}>
-                    {loading ? "Signing in..." : "Sign In"}
+                  <Button 
+                    type="submit" 
+                    className="w-full"
+                    disabled={isSignInLoading}
+                  >
+                    {isSignInLoading ? 'Signing In...' : 'Sign In'}
                   </Button>
                 </form>
               </TabsContent>
@@ -148,8 +178,8 @@ const Auth = () => {
                       id="signup-email"
                       type="email"
                       placeholder="Enter your email"
-                      value={email}
-                      onChange={(e) => setEmail(e.target.value)}
+                      value={signUpEmail}
+                      onChange={(e) => setSignUpEmail(e.target.value)}
                       required
                     />
                   </div>
@@ -159,18 +189,52 @@ const Auth = () => {
                       id="signup-password"
                       type="password"
                       placeholder="Create a password"
-                      value={password}
-                      onChange={(e) => setPassword(e.target.value)}
+                      value={signUpPassword}
+                      onChange={(e) => setSignUpPassword(e.target.value)}
                       required
-                      minLength={6}
                     />
                   </div>
-                  <Button type="submit" className="w-full" disabled={loading}>
-                    {loading ? "Creating account..." : "Sign Up"}
+                  <div className="space-y-2">
+                    <Label htmlFor="user-role">I am a</Label>
+                    <Select value={userRole} onValueChange={(value: 'agent' | 'buyer_seller') => setUserRole(value)}>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Select your role" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="buyer_seller">
+                          <div className="flex items-center space-x-2">
+                            <Users className="h-4 w-4" />
+                            <span>Buyer/Seller</span>
+                          </div>
+                        </SelectItem>
+                        <SelectItem value="agent">
+                          <div className="flex items-center space-x-2">
+                            <Building2 className="h-4 w-4" />
+                            <span>Real Estate Agent</span>
+                          </div>
+                        </SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  <Button 
+                    type="submit" 
+                    className="w-full"
+                    disabled={isSignUpLoading}
+                  >
+                    {isSignUpLoading ? 'Creating Account...' : 'Create Account'}
                   </Button>
                 </form>
               </TabsContent>
             </Tabs>
+
+            <div className="mt-6 text-center">
+              <Button variant="ghost" asChild>
+                <Link to="/" className="inline-flex items-center space-x-2">
+                  <ArrowLeft className="h-4 w-4" />
+                  <span>Back to Home</span>
+                </Link>
+              </Button>
+            </div>
           </CardContent>
         </Card>
       </div>

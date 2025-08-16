@@ -11,6 +11,7 @@ import Auth from "./pages/Auth";
 import Favorites from "./pages/Favorites";
 import Sell from "./pages/Sell";
 import Agents from "./pages/Agents";
+import Dashboard from "./pages/Dashboard";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -32,6 +33,7 @@ const App = () => (
             <Route path="/favorites" element={<Favorites />} />
             <Route path="/sell" element={<Sell />} />
             <Route path="/agents" element={<Agents />} />
+            <Route path="/dashboard" element={<Dashboard />} />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
           </Routes>

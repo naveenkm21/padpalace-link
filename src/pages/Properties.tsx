@@ -2,6 +2,7 @@ import { useState, useMemo, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import Header from '@/components/layout/Header';
 import Footer from '@/components/layout/Footer';
+import ChatBot from '@/components/chatbot/ChatBot';
 import PropertyCard from '@/components/properties/PropertyCard';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';

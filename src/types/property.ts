@@ -19,9 +19,18 @@ export interface Property {
   agent_id: string | null;
   created_at: string;
   updated_at: string;
+  property_category?: string;
+  listing_type?: string;
+  furnishing_status?: string;
+  floor_number?: number;
+  total_floors?: number;
+  parking_spaces?: number;
+  amenities?: string[];
   profiles?: {
     full_name: string | null;
     phone: string | null;
+    business_name?: string | null;
+    years_experience?: number | null;
   };
 }
 
@@ -40,9 +49,22 @@ export interface User {
   id: string;
   email: string;
   name: string;
-  role: 'buyer' | 'seller' | 'agent';
+  role: 'agent' | 'buyer_seller';
   avatar?: string;
   phone?: string;
   bio?: string;
+  business_name?: string;
+  license_number?: string;
+  years_experience?: number;
+  specializations?: string[];
+  service_areas?: string[];
   createdAt: string;
+}
+
+export interface UserRole {
+  id: string;
+  user_id: string;
+  role: 'agent' | 'buyer_seller';
+  created_at: string;
+  updated_at: string;
 }

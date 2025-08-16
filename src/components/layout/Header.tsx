@@ -11,9 +11,13 @@ const Header = () => {
   const { user, signOut } = useAuth();
 
   const navigation = [
-    { name: 'Buy', href: '/properties', icon: Search },
-    { name: 'Sell', href: '/sell', icon: Home },
+    { name: 'Properties', href: '/properties', icon: Search },
     { name: 'Agents', href: '/agents', icon: User },
+  ];
+
+  const userNavigation = [
+    { name: 'Dashboard', href: '/dashboard', icon: Home },
+    { name: 'List Property', href: '/sell', icon: Home },
   ];
 
   const isActive = (path: string) => location.pathname === path;
@@ -27,13 +31,28 @@ const Header = () => {
             <Home className="h-5 w-5" />
           </div>
           <span className="text-xl font-bold bg-gradient-primary bg-clip-text text-transparent">
-            EstateHub
+            PropertyHub
           </span>
         </Link>
 
         {/* Desktop Navigation */}
         <nav className="hidden md:flex items-center space-x-8">
           {navigation.map((item) => {
+            const Icon = item.icon;
+            return (
+              <Link
+                key={item.name}
+                to={item.href}
+                className={`flex items-center space-x-2 text-sm font-medium transition-colors hover:text-primary ${
+                  isActive(item.href) ? 'text-primary' : 'text-muted-foreground'
+                }`}
+              >
+                <Icon className="h-4 w-4" />
+                <span>{item.name}</span>
+              </Link>
+            );
+          })}
+          {user && userNavigation.map((item) => {
             const Icon = item.icon;
             return (
               <Link
@@ -94,12 +113,28 @@ const Header = () => {
                   <Home className="h-5 w-5" />
                 </div>
                 <span className="text-xl font-bold bg-gradient-primary bg-clip-text text-transparent">
-                  EstateHub
+                  PropertyHub
                 </span>
               </Link>
               
               <nav className="flex flex-col space-y-4">
                 {navigation.map((item) => {
+                  const Icon = item.icon;
+                  return (
+                    <Link
+                      key={item.name}
+                      to={item.href}
+                      onClick={() => setIsOpen(false)}
+                      className={`flex items-center space-x-3 text-lg font-medium transition-colors hover:text-primary ${
+                        isActive(item.href) ? 'text-primary' : 'text-muted-foreground'
+                      }`}
+                    >
+                      <Icon className="h-5 w-5" />
+                     <span>{item.name}</span>
+                    </Link>
+                  );
+                })}
+                {user && userNavigation.map((item) => {
                   const Icon = item.icon;
                   return (
                     <Link
