@@ -210,6 +210,48 @@ export type Database = {
         }
         Relationships: []
       }
+      visits: {
+        Row: {
+          created_at: string
+          id: string
+          message: string | null
+          property_id: string
+          status: string | null
+          updated_at: string
+          user_id: string
+          visit_date: string
+          visit_time: string
+          visitor_name: string
+          visitor_phone: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          message?: string | null
+          property_id: string
+          status?: string | null
+          updated_at?: string
+          user_id: string
+          visit_date: string
+          visit_time: string
+          visitor_name: string
+          visitor_phone: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          message?: string | null
+          property_id?: string
+          status?: string | null
+          updated_at?: string
+          user_id?: string
+          visit_date?: string
+          visit_time?: string
+          visitor_name?: string
+          visitor_phone?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
