@@ -38,14 +38,14 @@ const HeroSection = () => {
       <div className="relative z-10 container px-4 text-center text-white">
         <div className="max-w-4xl mx-auto">
           <h1 className="text-4xl md:text-6xl lg:text-7xl font-bold mb-6 leading-tight">
-            Find Your
+            Find Your Perfect
             <span className="block bg-gradient-to-r from-accent to-accent-hover bg-clip-text text-transparent">
-              Dream Home
+              Indian Property
             </span>
           </h1>
           <p className="text-xl md:text-2xl mb-8 text-white/90 max-w-2xl mx-auto">
-            Discover exceptional properties from luxury estates to cozy family homes. 
-            Your perfect home is just a search away.
+            Discover exceptional properties across India from Mumbai to Delhi, Bangalore to Chennai. 
+            Your dream home awaits in India's prime locations.
           </p>
 
           {/* Search Card */}
@@ -54,7 +54,7 @@ const HeroSection = () => {
               <div className="md:col-span-2 relative">
                 <MapPin className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-muted-foreground z-10" />
                 <Input
-                  placeholder="Enter city, neighborhood, or ZIP code"
+                  placeholder="Enter city like Mumbai, Delhi, Bangalore..."
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                   className="pl-10 h-12 text-foreground"
@@ -66,10 +66,11 @@ const HeroSection = () => {
                   <SelectValue placeholder="Property Type" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="house">House</SelectItem>
                   <SelectItem value="apartment">Apartment</SelectItem>
-                  <SelectItem value="condo">Condo</SelectItem>
-                  <SelectItem value="townhouse">Townhouse</SelectItem>
+                  <SelectItem value="villa">Villa</SelectItem>
+                  <SelectItem value="house">Independent House</SelectItem>
+                  <SelectItem value="flat">Flat</SelectItem>
+                  <SelectItem value="plot">Plot/Land</SelectItem>
                 </SelectContent>
               </Select>
 
@@ -78,10 +79,10 @@ const HeroSection = () => {
                   <SelectValue placeholder="Price Range" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="0-500k">Under $500K</SelectItem>
-                  <SelectItem value="500k-1m">$500K - $1M</SelectItem>
-                  <SelectItem value="1m-2m">$1M - $2M</SelectItem>
-                  <SelectItem value="2m+">$2M+</SelectItem>
+                  <SelectItem value="0-10L">Under ₹10 Lakhs</SelectItem>
+                  <SelectItem value="10L-50L">₹10L - ₹50L</SelectItem>
+                  <SelectItem value="50L-1Cr">₹50L - ₹1 Crore</SelectItem>
+                  <SelectItem value="1Cr+">₹1 Crore+</SelectItem>
                 </SelectContent>
               </Select>
             </div>

@@ -21,6 +21,8 @@ import {
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
 import { useToast } from '@/hooks/use-toast';
+import PropertyMap from '@/components/maps/PropertyMap';
+import BookVisit from '@/components/booking/BookVisit';
 
 interface Property {
   id: string;
@@ -36,6 +38,8 @@ interface Property {
   state: string;
   status: string;
   images: string[];
+  latitude?: number;
+  longitude?: number;
   agent_id?: string;
   profiles?: {
     full_name: string;
@@ -164,9 +168,9 @@ const PropertyDetail = () => {
   };
 
   const formatPrice = (price: number) => {
-    return new Intl.NumberFormat('en-US', {
+    return new Intl.NumberFormat('en-IN', {
       style: 'currency',
-      currency: 'USD',
+      currency: 'INR',
       minimumFractionDigits: 0,
     }).format(price);
   };
@@ -220,7 +224,7 @@ const PropertyDetail = () => {
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           {/* Image Gallery */}
-          <div className="lg:col-span-2">
+          <div className="lg:col-span-2 space-y-6">
             <div className="relative aspect-video rounded-lg overflow-hidden bg-muted mb-4">
               {property.images && property.images.length > 0 ? (
                 <>
@@ -277,6 +281,28 @@ const PropertyDetail = () => {
                 ))}
               </div>
             )}
+
+            {/* Property Map */}
+            <Card>
+              <CardContent className="p-0">
+                <PropertyMap
+                  latitude={property.latitude || undefined}
+                  longitude={property.longitude || undefined}
+                  address={`${property.address}, ${property.city}, ${property.state}`}
+                  className="h-[400px]"
+                />
+              </CardContent>
+            </Card>
+
+            {/* Property Description */}
+            <Card>
+              <CardContent className="p-6">
+                <h3 className="font-semibold mb-4 text-lg">About This Property</h3>
+                <p className="text-muted-foreground leading-relaxed">
+                  {property.description || 'This is a beautiful property located in a prime area with excellent connectivity and amenities. Perfect for families looking for a comfortable and modern living space.'}
+                </p>
+              </CardContent>
+            </Card>
           </div>
 
           {/* Property Details */}
@@ -337,13 +363,37 @@ const PropertyDetail = () => {
                 </div>
 
                 <div className="pt-4">
-                  <h3 className="font-semibold mb-2">Description</h3>
-                  <p className="text-muted-foreground leading-relaxed">
-                    {property.description}
-                  </p>
+                  <h3 className="font-semibold mb-2">Property Features</h3>
+                  <div className="grid grid-cols-2 gap-2 text-sm">
+                    <div className="flex items-center gap-2">
+                      <span className="w-2 h-2 bg-primary rounded-full"></span>
+                      <span>Type: {property.property_type}</span>
+                    </div>
+                    {property.square_feet && (
+                      <div className="flex items-center gap-2">
+                        <span className="w-2 h-2 bg-primary rounded-full"></span>
+                        <span>Area: {property.square_feet.toLocaleString()} sq ft</span>
+                      </div>
+                    )}
+                    <div className="flex items-center gap-2">
+                      <span className="w-2 h-2 bg-primary rounded-full"></span>
+                      <span>Status: {property.status}</span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <span className="w-2 h-2 bg-primary rounded-full"></span>
+                      <span>Location: {property.city}, {property.state}</span>
+                    </div>
+                  </div>
                 </div>
               </CardContent>
             </Card>
+
+            {/* Book Visit Section */}
+            <BookVisit
+              propertyId={property.id}
+              propertyTitle={property.title}
+              agentName={property.profiles?.full_name}
+            />
 
             {/* Agent Information */}
             {property.profiles && (

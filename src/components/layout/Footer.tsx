@@ -51,21 +51,21 @@ const Footer = () => {
               </span>
             </Link>
             <p className="text-muted-foreground mb-6 leading-relaxed">
-              Your trusted partner in real estate. We help you find, buy, sell, and manage 
-              properties with expertise and care.
+              Your trusted partner in Indian real estate. We help you find, buy, sell, and manage 
+              properties across India with expertise and care.
             </p>
             <div className="space-y-3">
               <div className="flex items-center space-x-3 text-sm text-muted-foreground">
                 <Phone className="h-4 w-4" />
-                <span>(555) 123-4567</span>
+                <span>+91 98765 43210</span>
               </div>
               <div className="flex items-center space-x-3 text-sm text-muted-foreground">
                 <Mail className="h-4 w-4" />
-                <span>hello@estatehub.com</span>
+                <span>hello@estatehub.in</span>
               </div>
               <div className="flex items-center space-x-3 text-sm text-muted-foreground">
                 <MapPin className="h-4 w-4" />
-                <span>123 Real Estate Ave, City, State 12345</span>
+                <span>123 Business Hub, Bandra Kurla Complex, Mumbai 400051</span>
               </div>
             </div>
           </div>
