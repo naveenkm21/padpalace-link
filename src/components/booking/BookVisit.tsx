@@ -60,8 +60,27 @@ const BookVisit = ({ propertyId, propertyTitle, agentName }: BookVisitProps) => 
     setIsSubmitting(true);
 
     try {
-      // Here you would typically save to your database
-      // For now, we'll just show a success message
+      // Save visit booking to database
+      const { data, error } = await supabase
+        .from('visits')
+        .insert([{
+          user_id: user.id,
+          property_id: propertyId,
+          visitor_name: visitorName,
+          visitor_phone: visitorPhone,
+          visit_date: selectedDate.toISOString().split('T')[0], // Format as YYYY-MM-DD
+          visit_time: selectedTime,
+          message: message || null,
+          status: 'pending'
+        }])
+        .select()
+        .single();
+
+      if (error) {
+        console.error('Error booking visit:', error);
+        throw error;
+      }
+
       const visitDateTime = `${format(selectedDate, 'PPP')} at ${selectedTime}`;
       
       toast({
