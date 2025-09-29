@@ -141,30 +141,30 @@ const Sell = () => {
 
               <div className="space-y-2 md:col-span-2">
                 <Label htmlFor="address">Address</Label>
-                <Input id="address" placeholder="123 Main St" {...register("address", { required: true })} />
+                <Input id="address" placeholder="Plot 123, Sector 15, Dwarka" {...register("address", { required: true })} />
                 {errors.address && <p className="text-sm text-destructive">Address is required</p>}
               </div>
 
               <div className="space-y-2">
                 <Label htmlFor="city">City</Label>
-                <Input id="city" placeholder="San Francisco" {...register("city", { required: true })} />
+                <Input id="city" placeholder="Mumbai" {...register("city", { required: true })} />
                 {errors.city && <p className="text-sm text-destructive">City is required</p>}
               </div>
 
               <div className="space-y-2">
                 <Label htmlFor="state">State</Label>
-                <Input id="state" placeholder="CA" {...register("state", { required: true })} />
+                <Input id="state" placeholder="Maharashtra" {...register("state", { required: true })} />
                 {errors.state && <p className="text-sm text-destructive">State is required</p>}
               </div>
 
               <div className="space-y-2">
                 <Label htmlFor="zip_code">ZIP code</Label>
-                <Input id="zip_code" placeholder="94105" {...register("zip_code")} />
+                <Input id="zip_code" placeholder="400001" {...register("zip_code")} />
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="price">Price (USD)</Label>
-                <Input id="price" type="number" min={0} step="1000" placeholder="750000" {...register("price", { required: true })} />
+                <Label htmlFor="price">Price (INR)</Label>
+                <Input id="price" type="number" min={0} step="100000" placeholder="7500000" {...register("price", { required: true })} />
                 {errors.price && <p className="text-sm text-destructive">Price is required</p>}
               </div>
 

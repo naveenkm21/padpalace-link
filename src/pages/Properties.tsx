@@ -146,7 +146,7 @@ const Properties = () => {
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-6 gap-4 mb-4">
               <div className="lg:col-span-2">
                 <Input
-                  placeholder="Search by location..."
+                  placeholder="Search by location (Mumbai, Delhi, Bangalore...)"
                   value={searchFilters.location || ''}
                   onChange={(e) => setSearchFilters(prev => ({ ...prev, location: e.target.value }))}
                   className="w-full"
