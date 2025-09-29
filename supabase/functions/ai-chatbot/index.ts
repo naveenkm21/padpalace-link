@@ -48,7 +48,7 @@ Always be helpful, friendly, and provide actionable advice for Indian property b
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        model: 'gpt-4.1-2025-04-14',
+        model: 'gpt-4o-mini',
         messages: [
           { role: 'system', content: systemPrompt },
           { role: 'user', content: message }
@@ -77,8 +77,9 @@ Always be helpful, friendly, and provide actionable advice for Indian property b
     });
   } catch (error) {
     console.error('Error in ai-chatbot function:', error);
+    const errorMessage = error instanceof Error ? error.message : 'An error occurred';
     return new Response(JSON.stringify({ 
-      error: error.message || 'An error occurred',
+      error: errorMessage,
       response: "I'm sorry, I'm having trouble responding right now. Please try again in a moment."
     }), {
       status: 500,
