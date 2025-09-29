@@ -61,7 +61,22 @@ Always be helpful, friendly, and provide actionable advice for Indian property b
     if (!response.ok) {
       const errorData = await response.text();
       console.error('OpenAI API error:', errorData);
-      throw new Error(`OpenAI API error: ${response.status}`);
+      
+      // Provide fallback response for common issues
+      let fallbackResponse = "I'm sorry, I'm having trouble connecting to my AI service right now.";
+      
+      if (response.status === 429) {
+        fallbackResponse = "Hi there! I'm PropertyBuddy, your Indian real estate assistant. I can help you find properties in Mumbai, Delhi, Bangalore, Pune, and other major Indian cities. What type of property are you looking for today? Please note: My AI service is temporarily unavailable, but I'd love to help you get started with your property search!";
+      } else if (response.status === 401) {
+        fallbackResponse = "Hello! I'm PropertyBuddy, your real estate assistant for India. I can help you explore properties in major Indian cities. How can I assist you with your property search today?";
+      }
+      
+      return new Response(JSON.stringify({ 
+        response: fallbackResponse,
+        timestamp: new Date().toISOString()
+      }), {
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      });
     }
 
     const data = await response.json();
