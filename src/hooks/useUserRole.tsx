@@ -48,24 +48,5 @@ export const useUserRole = () => {
     fetchUserRole();
   }, [user]);
 
-  const updateRole = async (newRole: 'agent' | 'buyer_seller') => {
-    if (!user) return false;
-
-    try {
-      const { error } = await supabase
-        .from('user_roles')
-        .upsert({ user_id: user.id, role: newRole });
-
-      if (!error) {
-        setRole(newRole);
-        return true;
-      }
-    } catch (error) {
-      console.error('Error updating user role:', error);
-    }
-
-    return false;
-  };
-
-  return { role, loading, updateRole };
+  return { role, loading };
 };

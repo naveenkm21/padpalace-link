@@ -10,6 +10,23 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { z } from "zod";
+
+const propertySchema = z.object({
+  title: z.string().trim().min(5, "Title must be at least 5 characters").max(200),
+  address: z.string().trim().min(10, "Address must be at least 10 characters").max(300),
+  city: z.string().trim().min(2, "City is required").max(100),
+  state: z.string().trim().min(2, "State is required").max(100),
+  zip_code: z.string().trim().regex(/^\d{6}$/, "Enter valid 6-digit PIN code").optional().or(z.literal('')),
+  price: z.coerce.number().min(100000, "Price must be at least ₹1,00,000").max(10000000000, "Price is too high"),
+  property_type: z.enum(["house", "condo", "apartment", "townhouse"]),
+  bedrooms: z.coerce.number().int().min(0).max(50).optional().or(z.literal('')),
+  bathrooms: z.coerce.number().min(0).max(50).optional().or(z.literal('')),
+  square_feet: z.coerce.number().int().min(100).max(1000000).optional().or(z.literal('')),
+  description: z.string().trim().max(2000, "Description must be less than 2000 characters").optional().or(z.literal('')),
+  images: z.string().trim().max(5000, "Image URLs are too long").optional().or(z.literal('')),
+});
 
 interface FormValues {
   title: string;
@@ -31,6 +48,7 @@ const Sell = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
   const { register, handleSubmit, setValue, formState: { errors, isSubmitting } } = useForm<FormValues>({
+    resolver: zodResolver(propertySchema),
     defaultValues: {
       state: "",
       property_type: "house",

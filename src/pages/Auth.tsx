@@ -10,6 +10,21 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { useToast } from '@/components/ui/use-toast';
 import { ArrowLeft, Building2, Users } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
+import { z } from 'zod';
+
+const signInSchema = z.object({
+  email: z.string().trim().email({ message: "Invalid email address" }).max(255),
+  password: z.string().min(6, { message: "Password must be at least 6 characters" }),
+});
+
+const signUpSchema = z.object({
+  fullName: z.string().trim().min(2, { message: "Name must be at least 2 characters" }).max(100),
+  email: z.string().trim().email({ message: "Invalid email address" }).max(255),
+  password: z.string().min(8, { message: "Password must be at least 8 characters" })
+    .regex(/[A-Z]/, { message: "Password must contain at least one uppercase letter" })
+    .regex(/[0-9]/, { message: "Password must contain at least one number" }),
+  role: z.enum(['agent', 'buyer_seller']),
+});
 
 const Auth = () => {
   const [signInEmail, setSignInEmail] = useState('');
@@ -77,6 +92,22 @@ const Auth = () => {
     setIsSignInLoading(true);
 
     try {
+      const validationResult = signInSchema.safeParse({ 
+        email: signInEmail, 
+        password: signInPassword 
+      });
+
+      if (!validationResult.success) {
+        const firstError = validationResult.error.errors[0];
+        toast({
+          title: "Validation Error",
+          description: firstError.message,
+          variant: "destructive",
+        });
+        setIsSignInLoading(false);
+        return;
+      }
+
       const { error } = await signIn(signInEmail, signInPassword);
       if (error) {
         toast({
@@ -107,6 +138,24 @@ const Auth = () => {
     setIsSignUpLoading(true);
 
     try {
+      const validationResult = signUpSchema.safeParse({
+        fullName,
+        email: signUpEmail,
+        password: signUpPassword,
+        role: userRole,
+      });
+
+      if (!validationResult.success) {
+        const firstError = validationResult.error.errors[0];
+        toast({
+          title: "Validation Error",
+          description: firstError.message,
+          variant: "destructive",
+        });
+        setIsSignUpLoading(false);
+        return;
+      }
+
       const { error } = await signUp(signUpEmail, signUpPassword, fullName);
       if (error) {
         toast({

@@ -13,6 +13,14 @@ import { CalendarIcon, Clock, User, Phone, MessageSquare } from 'lucide-react';
 import { format } from 'date-fns';
 import { cn } from '@/lib/utils';
 import { supabase } from '@/integrations/supabase/client';
+import { z } from 'zod';
+
+const visitSchema = z.object({
+  visitorName: z.string().trim().min(2, { message: "Name must be at least 2 characters" }).max(100),
+  visitorPhone: z.string().trim()
+    .regex(/^[6-9]\d{9}$/, { message: "Enter valid 10-digit Indian mobile number" }),
+  message: z.string().trim().max(500, { message: "Message must be less than 500 characters" }).optional(),
+});
 
 interface BookVisitProps {
   propertyId: string;
@@ -48,10 +56,26 @@ const BookVisit = ({ propertyId, propertyTitle, agentName }: BookVisitProps) => 
       return;
     }
 
-    if (!selectedDate || !selectedTime || !visitorName || !visitorPhone) {
+    if (!selectedDate || !selectedTime) {
       toast({
         title: "Missing information",
-        description: "Please fill in all required fields",
+        description: "Please select date and time",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    const validationResult = visitSchema.safeParse({
+      visitorName,
+      visitorPhone,
+      message,
+    });
+
+    if (!validationResult.success) {
+      const firstError = validationResult.error.errors[0];
+      toast({
+        title: "Validation Error",
+        description: firstError.message,
         variant: "destructive",
       });
       return;
@@ -66,11 +90,11 @@ const BookVisit = ({ propertyId, propertyTitle, agentName }: BookVisitProps) => 
         .insert([{
           user_id: user.id,
           property_id: propertyId,
-          visitor_name: visitorName,
-          visitor_phone: visitorPhone,
+          visitor_name: visitorName.trim(),
+          visitor_phone: visitorPhone.trim(),
           visit_date: selectedDate.toISOString().split('T')[0], // Format as YYYY-MM-DD
           visit_time: selectedTime,
-          message: message || null,
+          message: message?.trim() || null,
           status: 'pending'
         }])
         .select()
