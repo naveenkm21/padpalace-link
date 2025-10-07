@@ -48,23 +48,33 @@ const Agents = () => {
   useEffect(() => {
     const load = async () => {
       setLoading(true);
-      const [profilesRes, propertiesRes] = await Promise.all([
-        supabase.from("profiles").select("user_id, full_name, avatar_url, phone"),
-        supabase.from("properties").select("id, agent_id"),
-      ]);
+      try {
+        const [profilesRes, propertiesRes] = await Promise.all([
+          supabase.from("profiles").select("user_id, full_name, avatar_url, phone"),
+          supabase.from("properties").select("id, agent_id"),
+        ]);
 
-      if (!profilesRes.error && profilesRes.data) {
-        setProfiles(profilesRes.data as Profile[]);
-      }
-      if (!propertiesRes.error && propertiesRes.data) {
-        const map: Record<string, number> = {};
-        for (const row of propertiesRes.data as { id: string; agent_id: string | null }[]) {
-          if (!row.agent_id) continue;
-          map[row.agent_id] = (map[row.agent_id] || 0) + 1;
+        if (profilesRes.error) {
+          console.error('Error fetching profiles:', profilesRes.error);
+        } else if (profilesRes.data) {
+          setProfiles(profilesRes.data as Profile[]);
         }
-        setCounts(map);
+
+        if (propertiesRes.error) {
+          console.error('Error fetching properties:', propertiesRes.error);
+        } else if (propertiesRes.data) {
+          const map: Record<string, number> = {};
+          for (const row of propertiesRes.data as { id: string; agent_id: string | null }[]) {
+            if (!row.agent_id) continue;
+            map[row.agent_id] = (map[row.agent_id] || 0) + 1;
+          }
+          setCounts(map);
+        }
+      } catch (error) {
+        console.error('Error loading agents data:', error);
+      } finally {
+        setLoading(false);
       }
-      setLoading(false);
     };
     load();
   }, []);
@@ -183,14 +193,24 @@ const Agents = () => {
         </section>
 
         {/* No Results */}
-        {filtered.length === 0 && (
+        {filtered.length === 0 && !loading && (
           <div className="text-center py-16">
             <Search className="h-16 w-16 mx-auto text-muted-foreground mb-4" />
-            <h3 className="text-2xl font-semibold mb-2">No agents found</h3>
+            <h3 className="text-2xl font-semibold mb-2">
+              {q ? "No agents found" : "No agents available yet"}
+            </h3>
             <p className="text-muted-foreground mb-6">
-              Try adjusting your search to find agents.
+              {q 
+                ? "Try adjusting your search to find agents." 
+                : "Agent profiles will appear here once users register as agents and list properties."}
             </p>
-            <Button onClick={() => setQ("")}>Clear Search</Button>
+            {q ? (
+              <Button onClick={() => setQ("")}>Clear Search</Button>
+            ) : (
+              <Button asChild>
+                <Link to="/properties">Browse Properties</Link>
+              </Button>
+            )}
           </div>
         )}
       </main>
