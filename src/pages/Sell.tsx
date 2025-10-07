@@ -4,7 +4,7 @@ import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { useToast } from "@/hooks/use-toast";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
@@ -12,6 +12,9 @@ import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
+import Header from "@/components/layout/Header";
+import Footer from "@/components/layout/Footer";
+import { Home, MapPin, DollarSign, Bed, Bath, Ruler, Image as ImageIcon } from "lucide-react";
 
 const propertySchema = z.object({
   title: z.string().trim().min(5, "Title must be at least 5 characters").max(200),
@@ -122,103 +125,266 @@ const Sell = () => {
     }
   };
 
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-background">
+        <Header />
+        <div className="container px-4 py-8">
+          <div className="animate-pulse space-y-4">
+            <div className="h-8 bg-muted rounded w-1/4"></div>
+            <div className="h-96 bg-muted rounded-lg"></div>
+          </div>
+        </div>
+        <Footer />
+      </div>
+    );
+  }
+
   return (
-    <main className="container py-10">
-      <header className="mb-8">
-        <h1 className="text-3xl font-bold tracking-tight">Sell your property</h1>
-        <p className="text-muted-foreground mt-2">Create a new listing. You must be signed in.</p>
-      </header>
+    <div className="min-h-screen bg-background">
+      <Header />
+      
+      <main className="container px-4 py-8">
+        {/* Page Header */}
+        <div className="mb-8">
+          <h1 className="text-4xl font-bold mb-4">List Your Property</h1>
+          <p className="text-xl text-muted-foreground">
+            Create a new listing and reach thousands of potential buyers
+          </p>
+        </div>
 
-      <Card className="max-w-3xl">
-        <CardHeader>
-          <CardTitle>Property details</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <div className="space-y-2">
-                <Label htmlFor="title">Title</Label>
-                <Input id="title" placeholder="Charming family home" {...register("title", { required: true })} />
-                {errors.title && <p className="text-sm text-destructive">Title is required</p>}
+        <div className="max-w-4xl mx-auto">
+          <Card className="overflow-hidden">
+            <CardHeader className="bg-gradient-primary text-primary-foreground">
+              <div className="flex items-center gap-3">
+                <div className="p-3 bg-primary-foreground/10 rounded-lg">
+                  <Home className="h-6 w-6" />
+                </div>
+                <div>
+                  <CardTitle className="text-2xl">Property Details</CardTitle>
+                  <CardDescription className="text-primary-foreground/80">
+                    Fill in the information about your property
+                  </CardDescription>
+                </div>
               </div>
+            </CardHeader>
+            <CardContent className="p-6">
+              <form onSubmit={handleSubmit(onSubmit)} className="space-y-8">
+                {/* Basic Information */}
+                <div className="space-y-4">
+                  <div className="flex items-center gap-2 mb-4">
+                    <Home className="h-5 w-5 text-primary" />
+                    <h3 className="text-lg font-semibold">Basic Information</h3>
+                  </div>
+                  
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div className="space-y-2 md:col-span-2">
+                      <Label htmlFor="title">Property Title *</Label>
+                      <Input 
+                        id="title" 
+                        placeholder="e.g., Luxurious 3BHK Apartment in Mumbai" 
+                        {...register("title", { required: true })} 
+                      />
+                      {errors.title && <p className="text-sm text-destructive">{errors.title.message}</p>}
+                    </div>
 
-              <div className="space-y-2">
-                <Label htmlFor="property_type">Property type</Label>
-                <Select onValueChange={(v) => setValue("property_type", v)} defaultValue="house">
-                  <SelectTrigger id="property_type">
-                    <SelectValue placeholder="Select type" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="house">House</SelectItem>
-                    <SelectItem value="condo">Condo</SelectItem>
-                    <SelectItem value="apartment">Apartment</SelectItem>
-                    <SelectItem value="townhouse">Townhouse</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="property_type">Property Type *</Label>
+                      <Select onValueChange={(v) => setValue("property_type", v)} defaultValue="house">
+                        <SelectTrigger id="property_type">
+                          <SelectValue placeholder="Select type" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="house">House</SelectItem>
+                          <SelectItem value="condo">Condo</SelectItem>
+                          <SelectItem value="apartment">Apartment</SelectItem>
+                          <SelectItem value="townhouse">Townhouse</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
 
-              <div className="space-y-2 md:col-span-2">
-                <Label htmlFor="address">Address</Label>
-                <Input id="address" placeholder="Plot 123, Sector 15, Dwarka" {...register("address", { required: true })} />
-                {errors.address && <p className="text-sm text-destructive">Address is required</p>}
-              </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="price" className="flex items-center gap-2">
+                        <DollarSign className="h-4 w-4" />
+                        Price (INR) *
+                      </Label>
+                      <Input 
+                        id="price" 
+                        type="number" 
+                        min={0} 
+                        step="100000" 
+                        placeholder="75,00,000" 
+                        {...register("price", { required: true })} 
+                      />
+                      {errors.price && <p className="text-sm text-destructive">{errors.price.message}</p>}
+                    </div>
+                  </div>
+                </div>
 
-              <div className="space-y-2">
-                <Label htmlFor="city">City</Label>
-                <Input id="city" placeholder="Mumbai" {...register("city", { required: true })} />
-                {errors.city && <p className="text-sm text-destructive">City is required</p>}
-              </div>
+                {/* Location Details */}
+                <div className="space-y-4">
+                  <div className="flex items-center gap-2 mb-4">
+                    <MapPin className="h-5 w-5 text-primary" />
+                    <h3 className="text-lg font-semibold">Location Details</h3>
+                  </div>
+                  
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div className="space-y-2 md:col-span-2">
+                      <Label htmlFor="address">Street Address *</Label>
+                      <Input 
+                        id="address" 
+                        placeholder="Plot 123, Sector 15, Dwarka" 
+                        {...register("address", { required: true })} 
+                      />
+                      {errors.address && <p className="text-sm text-destructive">{errors.address.message}</p>}
+                    </div>
 
-              <div className="space-y-2">
-                <Label htmlFor="state">State</Label>
-                <Input id="state" placeholder="Maharashtra" {...register("state", { required: true })} />
-                {errors.state && <p className="text-sm text-destructive">State is required</p>}
-              </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="city">City *</Label>
+                      <Input 
+                        id="city" 
+                        placeholder="Mumbai" 
+                        {...register("city", { required: true })} 
+                      />
+                      {errors.city && <p className="text-sm text-destructive">{errors.city.message}</p>}
+                    </div>
 
-              <div className="space-y-2">
-                <Label htmlFor="zip_code">ZIP code</Label>
-                <Input id="zip_code" placeholder="400001" {...register("zip_code")} />
-              </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="state">State *</Label>
+                      <Input 
+                        id="state" 
+                        placeholder="Maharashtra" 
+                        {...register("state", { required: true })} 
+                      />
+                      {errors.state && <p className="text-sm text-destructive">{errors.state.message}</p>}
+                    </div>
 
-              <div className="space-y-2">
-                <Label htmlFor="price">Price (INR)</Label>
-                <Input id="price" type="number" min={0} step="100000" placeholder="7500000" {...register("price", { required: true })} />
-                {errors.price && <p className="text-sm text-destructive">Price is required</p>}
-              </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="zip_code">PIN Code</Label>
+                      <Input 
+                        id="zip_code" 
+                        placeholder="400001" 
+                        {...register("zip_code")} 
+                      />
+                      {errors.zip_code && <p className="text-sm text-destructive">{errors.zip_code.message}</p>}
+                    </div>
+                  </div>
+                </div>
 
-              <div className="space-y-2">
-                <Label htmlFor="bedrooms">Bedrooms</Label>
-                <Input id="bedrooms" type="number" min={0} step="1" placeholder="3" {...register("bedrooms")} />
-              </div>
+                {/* Property Features */}
+                <div className="space-y-4">
+                  <div className="flex items-center gap-2 mb-4">
+                    <Ruler className="h-5 w-5 text-primary" />
+                    <h3 className="text-lg font-semibold">Property Features</h3>
+                  </div>
+                  
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <div className="space-y-2">
+                      <Label htmlFor="bedrooms" className="flex items-center gap-2">
+                        <Bed className="h-4 w-4" />
+                        Bedrooms
+                      </Label>
+                      <Input 
+                        id="bedrooms" 
+                        type="number" 
+                        min={0} 
+                        step="1" 
+                        placeholder="3" 
+                        {...register("bedrooms")} 
+                      />
+                    </div>
 
-              <div className="space-y-2">
-                <Label htmlFor="bathrooms">Bathrooms</Label>
-                <Input id="bathrooms" type="number" min={0} step="0.5" placeholder="2" {...register("bathrooms")} />
-              </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="bathrooms" className="flex items-center gap-2">
+                        <Bath className="h-4 w-4" />
+                        Bathrooms
+                      </Label>
+                      <Input 
+                        id="bathrooms" 
+                        type="number" 
+                        min={0} 
+                        step="0.5" 
+                        placeholder="2" 
+                        {...register("bathrooms")} 
+                      />
+                    </div>
 
-              <div className="space-y-2">
-                <Label htmlFor="square_feet">Square feet</Label>
-                <Input id="square_feet" type="number" min={0} step="10" placeholder="1500" {...register("square_feet")} />
-              </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="square_feet">Square Feet</Label>
+                      <Input 
+                        id="square_feet" 
+                        type="number" 
+                        min={0} 
+                        step="10" 
+                        placeholder="1500" 
+                        {...register("square_feet")} 
+                      />
+                    </div>
+                  </div>
+                </div>
 
-              <div className="space-y-2 md:col-span-2">
-                <Label htmlFor="images">Image URLs (comma-separated)</Label>
-                <Input id="images" placeholder="https://... , https://..." {...register("images")} />
-              </div>
+                {/* Images and Description */}
+                <div className="space-y-4">
+                  <div className="flex items-center gap-2 mb-4">
+                    <ImageIcon className="h-5 w-5 text-primary" />
+                    <h3 className="text-lg font-semibold">Media & Description</h3>
+                  </div>
+                  
+                  <div className="space-y-6">
+                    <div className="space-y-2">
+                      <Label htmlFor="images">Image URLs</Label>
+                      <Input 
+                        id="images" 
+                        placeholder="https://example.com/image1.jpg, https://example.com/image2.jpg" 
+                        {...register("images")} 
+                      />
+                      <p className="text-sm text-muted-foreground">
+                        Enter multiple image URLs separated by commas
+                      </p>
+                    </div>
 
-              <div className="space-y-2 md:col-span-2">
-                <Label htmlFor="description">Description</Label>
-                <Textarea id="description" placeholder="Describe the property..." {...register("description")} />
-              </div>
-            </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="description">Property Description</Label>
+                      <Textarea 
+                        id="description" 
+                        placeholder="Describe your property, its features, nearby amenities, etc." 
+                        rows={6}
+                        {...register("description")} 
+                      />
+                      {errors.description && <p className="text-sm text-destructive">{errors.description.message}</p>}
+                    </div>
+                  </div>
+                </div>
 
-            <div className="flex justify-end">
-              <Button type="submit" disabled={isSubmitting}>{isSubmitting ? "Submitting..." : "Create listing"}</Button>
-            </div>
-          </form>
-        </CardContent>
-      </Card>
-    </main>
+                <div className="flex items-center justify-between pt-6 border-t">
+                  <p className="text-sm text-muted-foreground">
+                    * Required fields
+                  </p>
+                  <div className="flex gap-4">
+                    <Button 
+                      type="button" 
+                      variant="outline" 
+                      onClick={() => navigate("/properties")}
+                    >
+                      Cancel
+                    </Button>
+                    <Button 
+                      type="submit" 
+                      disabled={isSubmitting}
+                      className="min-w-[150px]"
+                    >
+                      {isSubmitting ? "Creating..." : "Create Listing"}
+                    </Button>
+                  </div>
+                </div>
+              </form>
+            </CardContent>
+          </Card>
+        </div>
+      </main>
+
+      <Footer />
+    </div>
   );
 };
 
