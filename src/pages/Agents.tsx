@@ -1,5 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
+import { useAuth } from "@/hooks/useAuth";
+import { useToast } from "@/hooks/use-toast";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -18,11 +20,23 @@ interface Profile {
 }
 
 const Agents = () => {
+  const navigate = useNavigate();
+  const { user, loading: authLoading } = useAuth();
+  const { toast } = useToast();
   const [profiles, setProfiles] = useState<Profile[]>([]);
   const [counts, setCounts] = useState<Record<string, number>>({});
   const [loading, setLoading] = useState(true);
   const [q, setQ] = useState("");
-  const navigate = useNavigate();
+
+  useEffect(() => {
+    if (!authLoading && !user) {
+      toast({
+        title: "Sign in required",
+        description: "Please sign in to view agents",
+      });
+      navigate('/auth');
+    }
+  }, [user, authLoading, navigate, toast]);
 
   // SEO
   useEffect(() => {
@@ -87,7 +101,7 @@ const Agents = () => {
     );
   }, [profiles, q]);
 
-  if (loading) {
+  if (authLoading || loading || !user) {
     return (
       <div className="min-h-screen bg-background">
         <Header />

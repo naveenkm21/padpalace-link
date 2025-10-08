@@ -47,7 +47,7 @@ interface FormValues {
 }
 
 const Sell = () => {
-  const { user, loading } = useAuth();
+  const { user, loading: authLoading } = useAuth();
   const navigate = useNavigate();
   const { toast } = useToast();
   const { register, handleSubmit, setValue, formState: { errors, isSubmitting } } = useForm<FormValues>({
@@ -80,10 +80,14 @@ const Sell = () => {
   }, []);
 
   useEffect(() => {
-    if (!loading && !user) {
+    if (!authLoading && !user) {
+      toast({
+        title: "Sign in required",
+        description: "Please sign in to list a property",
+      });
       navigate("/auth");
     }
-  }, [loading, user, navigate]);
+  }, [authLoading, user, navigate, toast]);
 
   const onSubmit = async (values: FormValues) => {
     if (!user) return;
@@ -125,7 +129,7 @@ const Sell = () => {
     }
   };
 
-  if (loading) {
+  if (authLoading || !user) {
     return (
       <div className="min-h-screen bg-background">
         <Header />

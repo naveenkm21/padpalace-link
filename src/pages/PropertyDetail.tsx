@@ -50,7 +50,7 @@ interface Property {
 const PropertyDetail = () => {
   const { id } = useParams();
   const navigate = useNavigate();
-  const { user } = useAuth();
+  const { user, loading: authLoading } = useAuth();
   const { toast } = useToast();
   const [property, setProperty] = useState<Property | null>(null);
   const [loading, setLoading] = useState(true);
@@ -58,8 +58,14 @@ const PropertyDetail = () => {
   const [isFavorited, setIsFavorited] = useState(false);
 
   useEffect(() => {
-    fetchProperty();
+    if (!authLoading && !user) {
+      navigate('/auth');
+    }
+  }, [user, authLoading, navigate]);
+
+  useEffect(() => {
     if (user) {
+      fetchProperty();
       checkFavoriteStatus();
     }
   }, [id, user]);
@@ -175,7 +181,7 @@ const PropertyDetail = () => {
     }).format(price);
   };
 
-  if (loading) {
+  if (authLoading || loading || !user) {
     return (
       <div className="min-h-screen bg-background">
         <Header />

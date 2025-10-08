@@ -1,5 +1,5 @@
 import { useState, useMemo, useEffect } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import Header from '@/components/layout/Header';
 import Footer from '@/components/layout/Footer';
 import ChatBot from '@/components/chatbot/ChatBot';
@@ -12,8 +12,13 @@ import { Badge } from '@/components/ui/badge';
 import { supabase } from '@/integrations/supabase/client';
 import { Property, SearchFilters } from '@/types/property';
 import { Search, Filter, Grid, List, SlidersHorizontal } from 'lucide-react';
+import { useAuth } from '@/hooks/useAuth';
+import { useToast } from '@/hooks/use-toast';
 
 const Properties = () => {
+  const navigate = useNavigate();
+  const { user, loading: authLoading } = useAuth();
+  const { toast } = useToast();
   const [properties, setProperties] = useState<Property[]>([]);
   const [loading, setLoading] = useState(true);
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
@@ -22,8 +27,17 @@ const Properties = () => {
   const [favorites, setFavorites] = useState<string[]>([]);
 
   useEffect(() => {
-    fetchProperties();
-  }, []);
+    if (!authLoading && !user) {
+      navigate('/auth');
+    }
+  }, [user, authLoading, navigate]);
+
+  useEffect(() => {
+    if (user) {
+      fetchProperties();
+      fetchFavorites();
+    }
+  }, [user]);
 
   const fetchProperties = async () => {
     try {
@@ -45,6 +59,22 @@ const Properties = () => {
       console.error('Error fetching properties:', error);
     } finally {
       setLoading(false);
+    }
+  };
+
+  const fetchFavorites = async () => {
+    if (!user) return;
+    
+    try {
+      const { data, error } = await supabase
+        .from('favorites')
+        .select('property_id')
+        .eq('user_id', user.id);
+
+      if (error) throw error;
+      setFavorites(data?.map(f => f.property_id) || []);
+    } catch (error) {
+      console.error('Error fetching favorites:', error);
     }
   };
 
@@ -94,12 +124,46 @@ const Properties = () => {
     return filtered;
   }, [properties, searchFilters, sortBy]);
 
-  const handleFavorite = (propertyId: string) => {
-    setFavorites(prev => 
-      prev.includes(propertyId) 
-        ? prev.filter(id => id !== propertyId)
-        : [...prev, propertyId]
-    );
+  const handleFavorite = async (propertyId: string) => {
+    if (!user) {
+      toast({
+        title: "Sign in required",
+        description: "Please sign in to save favorites",
+      });
+      navigate('/auth');
+      return;
+    }
+
+    try {
+      const isFavorited = favorites.includes(propertyId);
+      
+      if (isFavorited) {
+        await supabase
+          .from('favorites')
+          .delete()
+          .eq('user_id', user.id)
+          .eq('property_id', propertyId);
+        
+        setFavorites(prev => prev.filter(id => id !== propertyId));
+        toast({ title: "Removed from favorites" });
+      } else {
+        await supabase
+          .from('favorites')
+          .insert([{
+            user_id: user.id,
+            property_id: propertyId,
+          }]);
+        
+        setFavorites(prev => [...prev, propertyId]);
+        toast({ title: "Added to favorites" });
+      }
+    } catch (error) {
+      toast({
+        variant: "destructive",
+        title: "Error",
+        description: "Failed to update favorites",
+      });
+    }
   };
 
   const clearFilters = () => {
@@ -108,7 +172,7 @@ const Properties = () => {
 
   const activeFiltersCount = Object.values(searchFilters).filter(Boolean).length;
 
-  if (loading) {
+  if (authLoading || loading || !user) {
     return (
       <div className="min-h-screen bg-background">
         <Header />
