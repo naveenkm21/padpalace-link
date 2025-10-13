@@ -3,7 +3,7 @@ import { Link, useLocation } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
 import { useAuth } from '@/hooks/useAuth';
-import { Menu, User, Heart, Search, Home, LogOut } from 'lucide-react';
+import { Menu, User, Heart, Search, Home, LogOut, Building2, List } from 'lucide-react';
 
 const Header = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -17,7 +17,8 @@ const Header = () => {
 
   const userNavigation = [
     { name: 'Dashboard', href: '/dashboard', icon: Home },
-    { name: 'List Property', href: '/sell', icon: Home },
+    { name: 'List Property', href: '/sell', icon: Building2 },
+    { name: 'Manage Listings', href: '/manage-listings', icon: List },
   ];
 
   const isActive = (path: string) => location.pathname === path;

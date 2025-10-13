@@ -1,6 +1,6 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { useToast } from "@/hooks/use-toast";
@@ -50,7 +50,11 @@ const Sell = () => {
   const { user, loading: authLoading } = useAuth();
   const navigate = useNavigate();
   const { toast } = useToast();
-  const { register, handleSubmit, setValue, formState: { errors, isSubmitting } } = useForm<FormValues>({
+  const [searchParams] = useSearchParams();
+  const editId = searchParams.get("edit");
+  const [loading, setLoading] = useState(false);
+
+  const { register, handleSubmit, setValue, formState: { errors, isSubmitting }, reset } = useForm<FormValues>({
     resolver: zodResolver(propertySchema),
     defaultValues: {
       state: "",
@@ -89,6 +93,50 @@ const Sell = () => {
     }
   }, [authLoading, user, navigate, toast]);
 
+  // Fetch property data if editing
+  useEffect(() => {
+    if (editId && user) {
+      fetchPropertyData(editId);
+    }
+  }, [editId, user]);
+
+  const fetchPropertyData = async (id: string) => {
+    setLoading(true);
+    const { data, error } = await supabase
+      .from("properties")
+      .select("*")
+      .eq("id", id)
+      .eq("agent_id", user?.id) // Security: ensure user owns this property
+      .single();
+
+    if (error || !data) {
+      toast({
+        title: "Error",
+        description: "Property not found or you don't have permission to edit it",
+        variant: "destructive",
+      });
+      navigate("/manage-listings");
+      return;
+    }
+
+    // Populate form with existing data
+    reset({
+      title: data.title,
+      address: data.address,
+      city: data.city,
+      state: data.state,
+      zip_code: data.zip_code || "",
+      price: data.price,
+      property_type: data.property_type,
+      bedrooms: data.bedrooms || "",
+      bathrooms: data.bathrooms || "",
+      square_feet: data.square_feet || "",
+      description: data.description || "",
+      images: data.images?.join(", ") || "",
+    });
+    setLoading(false);
+  };
+
   const onSubmit = async (values: FormValues) => {
     if (!user) return;
 
@@ -107,29 +155,46 @@ const Sell = () => {
       images: values.images
         ? values.images.split(",").map((s) => s.trim()).filter(Boolean)
         : [],
-      agent_id: user.id,
-    } as const;
+    };
 
-    const { data, error } = await supabase
-      .from("properties")
-      .insert(payload)
-      .select("id")
-      .single();
+    if (editId) {
+      // Update existing property
+      const { error } = await supabase
+        .from("properties")
+        .update(payload)
+        .eq("id", editId)
+        .eq("agent_id", user.id); // Security: ensure user owns this property
 
-    if (error) {
-      toast({ title: "Failed to create listing", description: error.message });
-      return;
-    }
+      if (error) {
+        toast({ title: "Failed to update listing", description: error.message, variant: "destructive" });
+        return;
+      }
 
-    toast({ title: "Listing created", description: "Your property has been submitted." });
-    if (data?.id) {
-      navigate(`/property/${data.id}`);
+      toast({ title: "Listing updated", description: "Your property has been updated successfully." });
+      navigate(`/property/${editId}`);
     } else {
-      navigate("/properties");
+      // Create new property
+      const { data, error } = await supabase
+        .from("properties")
+        .insert({ ...payload, agent_id: user.id })
+        .select("id")
+        .single();
+
+      if (error) {
+        toast({ title: "Failed to create listing", description: error.message, variant: "destructive" });
+        return;
+      }
+
+      toast({ title: "Listing created", description: "Your property has been submitted." });
+      if (data?.id) {
+        navigate(`/property/${data.id}`);
+      } else {
+        navigate("/properties");
+      }
     }
   };
 
-  if (authLoading || !user) {
+  if (authLoading || !user || loading) {
     return (
       <div className="min-h-screen bg-background">
         <Header />
@@ -151,9 +216,13 @@ const Sell = () => {
       <main className="container px-4 py-8">
         {/* Page Header */}
         <div className="mb-8">
-          <h1 className="text-4xl font-bold mb-4">List Your Property</h1>
+          <h1 className="text-4xl font-bold mb-4">
+            {editId ? "Edit Property Listing" : "List Your Property"}
+          </h1>
           <p className="text-xl text-muted-foreground">
-            Create a new listing and reach thousands of potential buyers
+            {editId
+              ? "Update your property information"
+              : "Create a new listing and reach thousands of potential buyers"}
           </p>
         </div>
 
@@ -377,7 +446,9 @@ const Sell = () => {
                       disabled={isSubmitting}
                       className="min-w-[150px]"
                     >
-                      {isSubmitting ? "Creating..." : "Create Listing"}
+                      {isSubmitting 
+                        ? (editId ? "Updating..." : "Creating...") 
+                        : (editId ? "Update Listing" : "Create Listing")}
                     </Button>
                   </div>
                 </div>
