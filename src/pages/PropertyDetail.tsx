@@ -292,9 +292,8 @@ const PropertyDetail = () => {
             <Card>
               <CardContent className="p-0">
                 <PropertyMap
-                  latitude={property.latitude}
-                  longitude={property.longitude}
-                  city={property.city}
+                  latitude={property.latitude || undefined}
+                  longitude={property.longitude || undefined}
                   address={`${property.address}, ${property.city}, ${property.state}`}
                   className="h-[400px]"
                 />
