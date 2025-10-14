@@ -1,5 +1,4 @@
 import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
@@ -8,29 +7,13 @@ import { Search, MapPin, Home, TrendingUp } from 'lucide-react';
 import heroImage from '@/assets/hero-home.jpg';
 
 const HeroSection = () => {
-  const navigate = useNavigate();
   const [searchQuery, setSearchQuery] = useState('');
   const [propertyType, setPropertyType] = useState('');
   const [priceRange, setPriceRange] = useState('');
 
   const handleSearch = () => {
-    const params = new URLSearchParams();
-    
-    if (searchQuery) {
-      params.append('location', searchQuery);
-    }
-    
-    if (propertyType) {
-      params.append('propertyType', propertyType);
-    }
-    
-    if (priceRange) {
-      const [min, max] = priceRange.split('-');
-      params.append('minPrice', min);
-      params.append('maxPrice', max);
-    }
-    
-    navigate(`/properties?${params.toString()}`);
+    console.log('Search:', { searchQuery, propertyType, priceRange });
+    // Navigate to properties page with filters
   };
 
   const stats = [
@@ -83,10 +66,11 @@ const HeroSection = () => {
                   <SelectValue placeholder="Property Type" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="Apartment">Apartment</SelectItem>
-                  <SelectItem value="House">House</SelectItem>
-                  <SelectItem value="Condo">Condo</SelectItem>
-                  <SelectItem value="Townhouse">Townhouse</SelectItem>
+                  <SelectItem value="apartment">Apartment</SelectItem>
+                  <SelectItem value="villa">Villa</SelectItem>
+                  <SelectItem value="house">Independent House</SelectItem>
+                  <SelectItem value="flat">Flat</SelectItem>
+                  <SelectItem value="plot">Plot/Land</SelectItem>
                 </SelectContent>
               </Select>
 
@@ -95,10 +79,10 @@ const HeroSection = () => {
                   <SelectValue placeholder="Price Range" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="0-500000">Under $500K</SelectItem>
-                  <SelectItem value="500000-1000000">$500K - $1M</SelectItem>
-                  <SelectItem value="1000000-2000000">$1M - $2M</SelectItem>
-                  <SelectItem value="2000000-999999999">$2M+</SelectItem>
+                  <SelectItem value="0-10L">Under ₹10 Lakhs</SelectItem>
+                  <SelectItem value="10L-50L">₹10L - ₹50L</SelectItem>
+                  <SelectItem value="50L-1Cr">₹50L - ₹1 Crore</SelectItem>
+                  <SelectItem value="1Cr+">₹1 Crore+</SelectItem>
                 </SelectContent>
               </Select>
             </div>

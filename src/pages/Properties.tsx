@@ -1,5 +1,5 @@
 import { useState, useMemo, useEffect } from 'react';
-import { Link, useNavigate, useSearchParams } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import Header from '@/components/layout/Header';
 import Footer from '@/components/layout/Footer';
 import ChatBot from '@/components/chatbot/ChatBot';
@@ -17,7 +17,6 @@ import { useToast } from '@/hooks/use-toast';
 
 const Properties = () => {
   const navigate = useNavigate();
-  const [searchParams] = useSearchParams();
   const { user, loading: authLoading } = useAuth();
   const { toast } = useToast();
   const [properties, setProperties] = useState<Property[]>([]);
@@ -26,24 +25,6 @@ const Properties = () => {
   const [searchFilters, setSearchFilters] = useState<SearchFilters>({});
   const [sortBy, setSortBy] = useState<'price-asc' | 'price-desc' | 'newest' | 'oldest'>('newest');
   const [favorites, setFavorites] = useState<string[]>([]);
-
-  // Read URL parameters and set filters on mount
-  useEffect(() => {
-    const location = searchParams.get('location');
-    const propertyType = searchParams.get('propertyType');
-    const minPrice = searchParams.get('minPrice');
-    const maxPrice = searchParams.get('maxPrice');
-
-    const urlFilters: SearchFilters = {};
-    if (location) urlFilters.location = location;
-    if (propertyType) urlFilters.propertyType = propertyType;
-    if (minPrice) urlFilters.minPrice = parseInt(minPrice);
-    if (maxPrice) urlFilters.maxPrice = parseInt(maxPrice);
-
-    if (Object.keys(urlFilters).length > 0) {
-      setSearchFilters(urlFilters);
-    }
-  }, [searchParams]);
 
   useEffect(() => {
     if (!authLoading && !user) {
