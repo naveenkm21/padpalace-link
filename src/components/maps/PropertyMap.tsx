@@ -1,4 +1,3 @@
-import React, { useEffect } from 'react';
 import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet';
 import 'leaflet/dist/leaflet.css';
 import L from 'leaflet';
@@ -37,6 +36,9 @@ const PropertyMap = ({ latitude, longitude, city, address, className = "" }: Pro
     );
   }
 
+  const displayAddress = address || 'Property address';
+  const displayCity = city || 'City';
+
   return (
     <div className={`rounded-lg overflow-hidden ${className}`}>
       <MapContainer
@@ -54,8 +56,8 @@ const PropertyMap = ({ latitude, longitude, city, address, className = "" }: Pro
           <Popup>
             <div className="p-2 min-w-[200px]">
               <strong className="block mb-1">Property Location</strong>
-              <span className="text-sm text-muted-foreground block">{address || 'Property address'}</span>
-              <span className="text-xs text-muted-foreground block mt-1">📍 {city || 'City'}</span>
+              <span className="text-sm text-muted-foreground block">{displayAddress}</span>
+              <span className="text-xs text-muted-foreground block mt-1">📍 {displayCity}</span>
             </div>
           </Popup>
         </Marker>
