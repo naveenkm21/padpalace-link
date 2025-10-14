@@ -54,14 +54,8 @@ const PropertyMap = ({ latitude, longitude, city, address, className = "" }: Pro
           <Popup>
             <div className="p-2 min-w-[200px]">
               <strong className="block mb-1">Property Location</strong>
-              {address && (
-                <span className="text-sm text-muted-foreground block">{address}</span>
-              )}
-              {city && (
-                <span className="text-xs text-muted-foreground block mt-1">
-                  📍 {city}
-                </span>
-              )}
+              <span className="text-sm text-muted-foreground block">{address || 'Property address'}</span>
+              <span className="text-xs text-muted-foreground block mt-1">📍 {city || 'City'}</span>
             </div>
           </Popup>
         </Marker>
