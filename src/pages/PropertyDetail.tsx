@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, lazy, Suspense } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import Header from '@/components/layout/Header';
 import Footer from '@/components/layout/Footer';
@@ -21,8 +21,9 @@ import {
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
 import { useToast } from '@/hooks/use-toast';
-import PropertyMap from '@/components/maps/PropertyMap';
 import BookVisit from '@/components/booking/BookVisit';
+
+const PropertyMap = lazy(() => import('@/components/maps/PropertyMap'));
 
 interface Property {
   id: string;
@@ -291,13 +292,21 @@ const PropertyDetail = () => {
             {/* Property Map */}
             <Card>
               <CardContent className="p-0">
-                <PropertyMap
-                  latitude={property.latitude}
-                  longitude={property.longitude}
-                  city={property.city}
-                  address={`${property.address}, ${property.city}, ${property.state}`}
-                  className="h-[400px]"
-                />
+                <Suspense fallback={
+                  <div className="h-[400px] flex items-center justify-center bg-muted/50 rounded-lg">
+                    <div className="text-center p-8">
+                      <p className="text-muted-foreground">Loading map...</p>
+                    </div>
+                  </div>
+                }>
+                  <PropertyMap
+                    latitude={property.latitude}
+                    longitude={property.longitude}
+                    city={property.city}
+                    address={`${property.address}, ${property.city}, ${property.state}`}
+                    className="h-[400px]"
+                  />
+                </Suspense>
               </CardContent>
             </Card>
 
