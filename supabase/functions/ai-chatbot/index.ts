@@ -13,62 +13,73 @@ serve(async (req) => {
   }
 
   try {
-    const OPENAI_API_KEY = Deno.env.get('OPENAI_API_KEY');
-    if (!OPENAI_API_KEY) {
-      throw new Error('OPENAI_API_KEY is not set');
-    }
+    const GEMINI_API_KEY = 'AIzaSyBl_9DUsk1gnDEMU4CnFCO5yEycpUj6IQ4';
 
     const { message, budget, city, propertyType, context } = await req.json();
     
     console.log('Received chat request:', { message, budget, city, propertyType });
 
-    const systemPrompt = `You are an expert Indian real estate assistant helping users find the perfect property. Your name is PropertyBuddy and you specialize in the Indian real estate market.
+    const systemPrompt = `You are PropertyBuddy, an expert Indian real estate assistant dedicated to helping users navigate the Indian property market. Your role is to guide users through their property journey with expertise and warmth.
 
-Key guidelines:
-- Always use Indian Rupees (₹) for pricing
-- Focus on major Indian cities like Mumbai, Delhi, Bangalore, Chennai, Pune, Hyderabad, etc.
-- Understand Indian property types: 1BHK, 2BHK, 3BHK, Independent House, Villa, Plot, Commercial
-- Consider Indian-specific factors: parking, power backup, water supply, locality amenities
-- Be conversational and helpful, asking follow-up questions to better understand needs
-- Provide practical advice about Indian real estate trends, pricing, and locations
-- When users share their budget and preferences, give specific recommendations
+Core Responsibilities:
+- Help users find their perfect property based on their budget, location preferences, and requirements
+- Answer questions about property listings, pricing, localities, and amenities
+- Provide guidance on buying, selling, or renting properties in India
+- Explain real estate processes, documentation, and legal requirements
+- Offer market insights for major Indian cities (Mumbai, Delhi NCR, Bangalore, Pune, Chennai, Hyderabad, etc.)
+- Suggest suitable properties based on user preferences
+- Help users understand different property types (1BHK, 2BHK, 3BHK, Villa, Plot, Commercial, etc.)
 
-Current user context:
-${context ? `Budget: ₹${budget?.toLocaleString('en-IN') || 'Not specified'}
+Key Guidelines:
+- Always use Indian Rupees (₹) and Indian numbering system (Lakhs, Crores)
+- Consider Indian-specific factors: Vastu, parking, power backup, water supply, society amenities
+- Be conversational, friendly, and patient
+- Ask clarifying questions to better understand user needs
+- Provide practical, actionable advice
+- Help users make informed decisions by explaining pros and cons
+- Guide users on next steps (viewing properties, documentation, legal checks, etc.)
+- Address concerns about locality, connectivity, schools, hospitals nearby
+
+Current User Context:
+${context ? `Budget: ${budget ? '₹' + budget.toLocaleString('en-IN') : 'Not specified'}
 Preferred City: ${city || 'Not specified'}
 Property Type: ${propertyType || 'Not specified'}
-Previous conversation context: ${context}` : 'New conversation'}
+Conversation History: ${context}` : 'This is a new conversation'}
 
-Always be helpful, friendly, and provide actionable advice for Indian property buyers and sellers.`;
+Remember: You're not just answering questions - you're guiding users through one of their most important life decisions. Be helpful, thorough, and supportive.`;
 
-    const response = await fetch('https://api.openai.com/v1/chat/completions', {
+    const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${GEMINI_API_KEY}`, {
       method: 'POST',
       headers: {
-        'Authorization': `Bearer ${OPENAI_API_KEY}`,
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        model: 'gpt-4o-mini',
-        messages: [
-          { role: 'system', content: systemPrompt },
-          { role: 'user', content: message }
+        contents: [
+          {
+            parts: [
+              { text: systemPrompt },
+              { text: `User message: ${message}` }
+            ]
+          }
         ],
-        max_tokens: 500,
-        temperature: 0.7,
+        generationConfig: {
+          temperature: 0.7,
+          topK: 40,
+          topP: 0.95,
+          maxOutputTokens: 1024,
+        },
       }),
     });
 
     if (!response.ok) {
       const errorData = await response.text();
-      console.error('OpenAI API error:', errorData);
+      console.error('Gemini API error:', response.status, errorData);
       
-      // Provide fallback response for common issues
-      let fallbackResponse = "I'm sorry, I'm having trouble connecting to my AI service right now.";
+      // Provide helpful fallback response
+      let fallbackResponse = "Hello! I'm PropertyBuddy, your Indian real estate assistant. 🏠\n\nI can help you with:\n- Finding properties based on your budget and location\n- Understanding property prices and market trends\n- Guidance on buying, selling, or renting\n- Property documentation and legal processes\n- Locality insights and amenities\n\nHow can I assist you with your property search today?";
       
       if (response.status === 429) {
-        fallbackResponse = "Hi there! I'm PropertyBuddy, your Indian real estate assistant. I can help you find properties in Mumbai, Delhi, Bangalore, Pune, and other major Indian cities. What type of property are you looking for today? Please note: My AI service is temporarily unavailable, but I'd love to help you get started with your property search!";
-      } else if (response.status === 401) {
-        fallbackResponse = "Hello! I'm PropertyBuddy, your real estate assistant for India. I can help you explore properties in major Indian cities. How can I assist you with your property search today?";
+        fallbackResponse = "I'm experiencing high demand right now. Let me help you with basic guidance:\n\nWhat are you looking for?\n1. Properties to buy\n2. Properties to rent\n3. Selling your property\n4. Property market information\n\nPlease tell me your requirements and I'll do my best to assist!";
       }
       
       return new Response(JSON.stringify({ 
@@ -80,7 +91,10 @@ Always be helpful, friendly, and provide actionable advice for Indian property b
     }
 
     const data = await response.json();
-    const botResponse = data.choices[0].message.content;
+    console.log('Gemini response:', JSON.stringify(data, null, 2));
+    
+    const botResponse = data.candidates?.[0]?.content?.parts?.[0]?.text || 
+      "I'm here to help you with your property search! Could you tell me more about what you're looking for?";
 
     console.log('Bot response generated successfully');
 
@@ -95,7 +109,7 @@ Always be helpful, friendly, and provide actionable advice for Indian property b
     const errorMessage = error instanceof Error ? error.message : 'An error occurred';
     return new Response(JSON.stringify({ 
       error: errorMessage,
-      response: "I'm sorry, I'm having trouble responding right now. Please try again in a moment."
+      response: "I'm PropertyBuddy, your real estate assistant! I'm here to help you find the perfect property in India. What are you looking for today - a home to buy, rent, or would you like to sell a property?"
     }), {
       status: 500,
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },

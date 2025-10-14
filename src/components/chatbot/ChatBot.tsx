@@ -42,7 +42,18 @@ const ChatBot: React.FC<ChatBotProps> = ({ userBudget, userCity, userPropertyTyp
       const welcomeMessage: Message = {
         id: 'welcome',
         type: 'bot',
-        content: `Namaste! I'm PropertyBuddy, your Indian real estate assistant. 🏠\n\nI can help you find the perfect property in India based on your budget, preferred city, and requirements. Whether you're looking to buy, sell, or rent, I'm here to guide you!\n\nWhat kind of property are you looking for today?`,
+        content: `Namaste! I'm PropertyBuddy, your personal real estate assistant for India. 🏠
+
+I'm here to help you with:
+✨ Finding your dream property
+💰 Understanding market prices and trends
+📍 Exploring different localities
+📋 Guidance on documentation and processes
+🔍 Property recommendations based on your needs
+
+Whether you're buying, selling, or renting, I'm here to guide you every step of the way!
+
+What brings you here today?`,
         timestamp: new Date()
       };
       setMessages([welcomeMessage]);
