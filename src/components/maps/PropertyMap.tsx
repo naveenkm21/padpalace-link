@@ -2,6 +2,7 @@ import React, { useEffect } from 'react';
 import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet';
 import 'leaflet/dist/leaflet.css';
 import L from 'leaflet';
+import { getPropertyCoordinates } from '@/utils/geocoding';
 
 // Fix for default marker icon issue in React-Leaflet with Vite
 delete (L.Icon.Default.prototype as any)._getIconUrl;
@@ -12,18 +13,25 @@ L.Icon.Default.mergeOptions({
 });
 
 interface PropertyMapProps {
-  latitude?: number;
-  longitude?: number;
+  latitude?: number | null;
+  longitude?: number | null;
+  city?: string;
   address?: string;
   className?: string;
 }
 
-const PropertyMap = ({ latitude, longitude, address, className = "" }: PropertyMapProps) => {
-  if (!latitude || !longitude) {
+const PropertyMap = ({ latitude, longitude, city, address, className = "" }: PropertyMapProps) => {
+  // Get coordinates from lat/lng or geocode from city
+  const coordinates = getPropertyCoordinates(latitude, longitude, city);
+
+  if (!coordinates) {
     return (
       <div className={`rounded-lg bg-muted/50 flex items-center justify-center ${className}`}>
-        <div className="text-center p-4">
-          <p className="text-muted-foreground">Location not available</p>
+        <div className="text-center p-8">
+          <p className="text-muted-foreground mb-2">📍 Location Map</p>
+          <p className="text-sm text-muted-foreground">
+            {city ? `Location data for ${city} not available` : 'Location not available'}
+          </p>
         </div>
       </div>
     );
@@ -32,24 +40,27 @@ const PropertyMap = ({ latitude, longitude, address, className = "" }: PropertyM
   return (
     <div className={`rounded-lg overflow-hidden ${className}`}>
       <MapContainer
-        center={[latitude, longitude]}
-        zoom={15}
+        center={[coordinates.lat, coordinates.lng]}
+        zoom={13}
         scrollWheelZoom={false}
         className="w-full h-full min-h-[400px]"
+        style={{ zIndex: 0 }}
       >
         <TileLayer
           attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
           url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
         />
-        <Marker position={[latitude, longitude]}>
+        <Marker position={[coordinates.lat, coordinates.lng]}>
           <Popup>
-            <div className="p-2">
-              <strong>Property Location</strong>
+            <div className="p-2 min-w-[200px]">
+              <strong className="block mb-1">Property Location</strong>
               {address && (
-                <>
-                  <br />
-                  <span className="text-sm text-muted-foreground">{address}</span>
-                </>
+                <span className="text-sm text-muted-foreground block">{address}</span>
+              )}
+              {city && (
+                <span className="text-xs text-muted-foreground block mt-1">
+                  📍 {city}
+                </span>
               )}
             </div>
           </Popup>
