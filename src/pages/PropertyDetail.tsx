@@ -1,29 +1,32 @@
-import { useState, useEffect, lazy, Suspense } from 'react';
+import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import Header from '@/components/layout/Header';
 import Footer from '@/components/layout/Footer';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent } from '@/components/ui/card';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { 
-  ArrowLeft, 
-  Heart, 
-  Share2, 
-  Bed, 
-  Bath, 
-  Square, 
+import {
+  Home,
+  Bed,
+  Bath,
+  Square,
   MapPin,
-  Phone,
-  Mail,
+  Heart,
+  Share2,
+  Calendar,
+  Car,
+  Trash2,
+  ArrowLeft,
   ChevronLeft,
-  ChevronRight
+  ChevronRight,
+  Phone,
+  Mail
 } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
 import { useToast } from '@/hooks/use-toast';
+import PropertyMap from '@/components/maps/PropertyMap';
 import BookVisit from '@/components/booking/BookVisit';
-
-const PropertyMap = lazy(() => import('@/components/maps/PropertyMap'));
 
 interface Property {
   id: string;
@@ -292,21 +295,13 @@ const PropertyDetail = () => {
             {/* Property Map */}
             <Card>
               <CardContent className="p-0">
-                <Suspense fallback={
-                  <div className="h-[400px] flex items-center justify-center bg-muted/50 rounded-lg">
-                    <div className="text-center p-8">
-                      <p className="text-muted-foreground">Loading map...</p>
-                    </div>
-                  </div>
-                }>
-                  <PropertyMap
-                    latitude={property.latitude}
-                    longitude={property.longitude}
-                    city={property.city}
-                    address={`${property.address}, ${property.city}, ${property.state}`}
-                    className="h-[400px]"
-                  />
-                </Suspense>
+                <PropertyMap
+                  latitude={property.latitude}
+                  longitude={property.longitude}
+                  city={property.city}
+                  address={`${property.address}, ${property.city}, ${property.state}`}
+                  className="h-[400px]"
+                />
               </CardContent>
             </Card>
 
