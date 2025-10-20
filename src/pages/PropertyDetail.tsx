@@ -295,7 +295,13 @@ const PropertyDetail = () => {
             {/* City Map */}
             <Card>
               <CardContent className="p-0">
-                <CityMap city={property.city} className="h-[400px]" />
+                <CityMap 
+                  city={property.city}
+                  address={property.address}
+                  latitude={property.latitude}
+                  longitude={property.longitude}
+                  className="h-[400px]" 
+                />
               </CardContent>
             </Card>
 

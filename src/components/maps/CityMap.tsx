@@ -49,17 +49,36 @@ const cityPlaces: Record<string, Array<{ name: string; coords: [number, number] 
 
 interface CityMapProps {
   city?: string;
+  address?: string;
+  latitude?: number | null;
+  longitude?: number | null;
   className?: string;
 }
 
-const CityMap = ({ city, className = "" }: CityMapProps) => {
-  const randomPlace = useMemo(() => {
+const CityMap = ({ city, address, latitude, longitude, className = "" }: CityMapProps) => {
+  const { coordinates, locationName, useRandomPlace } = useMemo(() => {
+    // If we have exact coordinates, use them
+    if (latitude && longitude) {
+      return {
+        coordinates: [latitude, longitude] as [number, number],
+        locationName: address || "Property Location",
+        useRandomPlace: false
+      };
+    }
+    
+    // Otherwise, fall back to random popular place in the city
     const normalizedCity = city?.toLowerCase() || "delhi";
     const places = cityPlaces[normalizedCity] || cityPlaces.delhi;
-    return places[Math.floor(Math.random() * places.length)];
-  }, [city]);
+    const randomPlace = places[Math.floor(Math.random() * places.length)];
+    
+    return {
+      coordinates: randomPlace.coords,
+      locationName: randomPlace.name,
+      useRandomPlace: true
+    };
+  }, [city, address, latitude, longitude]);
 
-  const mapUrl = `https://www.openstreetmap.org/export/embed.html?bbox=${randomPlace.coords[1]-0.02},${randomPlace.coords[0]-0.02},${randomPlace.coords[1]+0.02},${randomPlace.coords[0]+0.02}&layer=mapnik&marker=${randomPlace.coords[0]},${randomPlace.coords[1]}`;
+  const mapUrl = `https://www.openstreetmap.org/export/embed.html?bbox=${coordinates[1]-0.01},${coordinates[0]-0.01},${coordinates[1]+0.01},${coordinates[0]+0.01}&layer=mapnik&marker=${coordinates[0]},${coordinates[1]}`;
 
   return (
     <div className={`w-full rounded-xl overflow-hidden bg-muted/50 ${className}`}>
@@ -72,14 +91,16 @@ const CityMap = ({ city, className = "" }: CityMapProps) => {
         marginWidth={0}
         src={mapUrl}
         style={{ border: 0, minHeight: '400px' }}
-        title={`Map of ${randomPlace.name}`}
+        title={`Map of ${locationName}`}
       />
       <div className="p-4 bg-background/95 backdrop-blur">
         <div className="flex items-center gap-2">
           <MapPin className="h-5 w-5 text-primary" />
           <div>
-            <p className="font-semibold">{randomPlace.name}</p>
-            <p className="text-sm text-muted-foreground">Popular location in {city}</p>
+            <p className="font-semibold">{locationName}</p>
+            <p className="text-sm text-muted-foreground">
+              {useRandomPlace ? `Popular location in ${city}` : `${city}`}
+            </p>
           </div>
         </div>
       </div>
