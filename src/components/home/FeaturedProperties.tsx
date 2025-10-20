@@ -5,6 +5,7 @@ import PropertyCard from '@/components/properties/PropertyCard';
 import { supabase } from '@/integrations/supabase/client';
 import { Property } from '@/types/property';
 import { ArrowRight } from 'lucide-react';
+import FadeIn from '@/components/transitions/FadeIn';
 
 const FeaturedProperties = () => {
   const [properties, setProperties] = useState<Property[]>([]);
@@ -41,15 +42,17 @@ const FeaturedProperties = () => {
   return (
     <section className="py-20 bg-muted/30">
       <div className="container px-4">
-        <div className="text-center mb-16">
-          <h2 className="text-4xl md:text-5xl font-bold mb-6">
-            Featured Properties
-          </h2>
-          <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
-            Discover our handpicked selection of exceptional properties, 
-            carefully chosen for their unique features and prime locations.
-          </p>
-        </div>
+        <FadeIn>
+          <div className="text-center mb-16">
+            <h2 className="text-4xl md:text-5xl font-bold mb-6">
+              Featured Properties
+            </h2>
+            <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
+              Discover our handpicked selection of exceptional properties, 
+              carefully chosen for their unique features and prime locations.
+            </p>
+          </div>
+        </FadeIn>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-12">
           {loading ? (
@@ -61,10 +64,12 @@ const FeaturedProperties = () => {
               </div>
             ))
           ) : properties.length > 0 ? (
-            properties.map((property) => (
-              <Link key={property.id} to={`/property/${property.id}`}>
-                <PropertyCard property={property} />
-              </Link>
+            properties.map((property, index) => (
+              <FadeIn key={property.id} delay={index * 0.1} direction="up">
+                <Link to={`/property/${property.id}`}>
+                  <PropertyCard property={property} />
+                </Link>
+              </FadeIn>
             ))
           ) : (
             <div className="col-span-full text-center py-8">
@@ -73,14 +78,16 @@ const FeaturedProperties = () => {
           )}
         </div>
 
-        <div className="text-center">
-          <Button size="lg" asChild>
-            <Link to="/properties">
-              View All Properties
-              <ArrowRight className="ml-2 h-5 w-5" />
-            </Link>
-          </Button>
-        </div>
+        <FadeIn delay={0.3}>
+          <div className="text-center">
+            <Button size="lg" asChild className="hover-lift">
+              <Link to="/properties">
+                View All Properties
+                <ArrowRight className="ml-2 h-5 w-5" />
+              </Link>
+            </Button>
+          </div>
+        </FadeIn>
       </div>
     </section>
   );

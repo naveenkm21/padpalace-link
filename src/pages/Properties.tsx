@@ -14,6 +14,8 @@ import { Property, SearchFilters } from '@/types/property';
 import { Search, Filter, Grid, List, SlidersHorizontal } from 'lucide-react';
 import { useAuth } from '@/hooks/useAuth';
 import { useToast } from '@/hooks/use-toast';
+import PageTransition from '@/components/transitions/PageTransition';
+import FadeIn from '@/components/transitions/FadeIn';
 
 const Properties = () => {
   const navigate = useNavigate();
@@ -211,17 +213,20 @@ const Properties = () => {
   }
 
   return (
-    <div className="min-h-screen bg-background">
-      <Header />
-      
-      <main className="container px-4 py-8">
-        {/* Page Header */}
-        <div className="mb-8">
-          <h1 className="text-4xl font-bold mb-4">Properties for Sale</h1>
-          <p className="text-xl text-muted-foreground">
-            Discover {filteredAndSortedProperties.length} exceptional properties
-          </p>
-        </div>
+    <PageTransition>
+      <div className="min-h-screen bg-background">
+        <Header />
+        
+        <main className="container px-4 py-8">
+          {/* Page Header */}
+          <FadeIn>
+            <div className="mb-8">
+              <h1 className="text-4xl font-bold mb-4">Properties for Sale</h1>
+              <p className="text-xl text-muted-foreground">
+                Discover {filteredAndSortedProperties.length} exceptional properties
+              </p>
+            </div>
+          </FadeIn>
 
         {/* Filters Section */}
         <Card className="mb-8">
@@ -352,14 +357,16 @@ const Properties = () => {
             ? 'grid-cols-1 md:grid-cols-2 lg:grid-cols-3' 
             : 'grid-cols-1'
         }`}>
-          {filteredAndSortedProperties.map((property) => (
-            <Link key={property.id} to={`/property/${property.id}`}>
-              <PropertyCard 
-                property={property} 
-                onFavorite={handleFavorite}
-                isFavorited={favorites.includes(property.id)}
-              />
-            </Link>
+          {filteredAndSortedProperties.map((property, index) => (
+            <FadeIn key={property.id} delay={index * 0.05} direction="up">
+              <Link to={`/property/${property.id}`}>
+                <PropertyCard 
+                  property={property} 
+                  onFavorite={handleFavorite}
+                  isFavorited={favorites.includes(property.id)}
+                />
+              </Link>
+            </FadeIn>
           ))}
         </div>
 
@@ -377,7 +384,8 @@ const Properties = () => {
       </main>
 
       <Footer />
-    </div>
+      </div>
+    </PageTransition>
   );
 };
 

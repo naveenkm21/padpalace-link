@@ -151,6 +151,10 @@
     @apply bg-background text-foreground;
     font-feature-settings: 'rlig' 1, 'calt' 1;
   }
+  
+  html {
+    scroll-behavior: smooth;
+  }
 
   /* Custom scrollbar */
   ::-webkit-scrollbar {
@@ -179,5 +183,23 @@
   *:focus-visible {
     outline: 2px solid hsl(var(--ring));
     outline-offset: 2px;
+  }
+}
+
+@layer utilities {
+  .hover-lift {
+    @apply transition-all duration-300 hover:-translate-y-2 hover:shadow-lg;
+  }
+  
+  .hover-scale {
+    @apply transition-transform duration-300 hover:scale-105;
+  }
+  
+  .hover-glow {
+    @apply transition-all duration-300 hover:shadow-[0_0_20px_rgba(var(--primary),0.3)];
+  }
+  
+  .smooth-transition {
+    @apply transition-all duration-300 ease-in-out;
   }
 }

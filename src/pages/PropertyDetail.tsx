@@ -27,6 +27,8 @@ import { useAuth } from '@/hooks/useAuth';
 import { useToast } from '@/hooks/use-toast';
 import BookVisit from '@/components/booking/BookVisit';
 import CityMap from '@/components/maps/CityMap';
+import PageTransition from '@/components/transitions/PageTransition';
+import FadeIn from '@/components/transitions/FadeIn';
 
 interface Property {
   id: string;
@@ -217,20 +219,23 @@ const PropertyDetail = () => {
   }
 
   return (
-    <div className="min-h-screen bg-background">
-      <Header />
-      
-      <main className="container mx-auto px-4 py-8">
-        <div className="mb-6">
-          <Button 
-            variant="outline" 
-            onClick={() => navigate(-1)}
-            className="gap-2"
-          >
-            <ArrowLeft className="h-4 w-4" />
-            Back
-          </Button>
-        </div>
+    <PageTransition>
+      <div className="min-h-screen bg-background">
+        <Header />
+        
+        <main className="container mx-auto px-4 py-8">
+          <FadeIn>
+            <div className="mb-6">
+              <Button 
+                variant="outline" 
+                onClick={() => navigate(-1)}
+                className="gap-2 hover-lift"
+              >
+                <ArrowLeft className="h-4 w-4" />
+                Back
+              </Button>
+            </div>
+          </FadeIn>
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           {/* Image Gallery */}
@@ -546,7 +551,8 @@ const PropertyDetail = () => {
       </main>
 
       <Footer />
-    </div>
+      </div>
+    </PageTransition>
   );
 };
 
