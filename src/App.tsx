@@ -11,6 +11,7 @@ import Auth from "./pages/Auth";
 import Favorites from "./pages/Favorites";
 import Sell from "./pages/Sell";
 import Agents from "./pages/Agents";
+import AgentTerms from "./pages/AgentTerms";
 import Dashboard from "./pages/Dashboard";
 import ManageListings from "./pages/ManageListings";
 import NotFound from "./pages/NotFound";
@@ -35,6 +36,7 @@ const App = () => (
             <Route path="/sell" element={<Sell />} />
             <Route path="/manage-listings" element={<ManageListings />} />
             <Route path="/agents" element={<Agents />} />
+            <Route path="/agents/join" element={<AgentTerms />} />
             <Route path="/dashboard" element={<Dashboard />} />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
