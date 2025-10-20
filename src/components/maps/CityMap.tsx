@@ -1,15 +1,5 @@
 import React, { useMemo } from "react";
-import { MapContainer, TileLayer, Marker, Popup } from "react-leaflet";
-import L from "leaflet";
-import "leaflet/dist/leaflet.css";
-
-// Fix for default marker icon issue
-delete (L.Icon.Default.prototype as any)._getIconUrl;
-L.Icon.Default.mergeOptions({
-  iconRetinaUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon-2x.png',
-  iconUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon.png',
-  shadowUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-shadow.png',
-});
+import { MapPin } from "lucide-react";
 
 // City places with popular locations
 const cityPlaces: Record<string, Array<{ name: string; coords: [number, number] }>> = {
@@ -69,29 +59,30 @@ const CityMap = ({ city, className = "" }: CityMapProps) => {
     return places[Math.floor(Math.random() * places.length)];
   }, [city]);
 
+  const mapUrl = `https://www.openstreetmap.org/export/embed.html?bbox=${randomPlace.coords[1]-0.02},${randomPlace.coords[0]-0.02},${randomPlace.coords[1]+0.02},${randomPlace.coords[0]+0.02}&layer=mapnik&marker=${randomPlace.coords[0]},${randomPlace.coords[1]}`;
+
   return (
-    <div className={`w-full rounded-xl overflow-hidden ${className}`}>
-      <MapContainer
-        center={randomPlace.coords}
-        zoom={13}
-        scrollWheelZoom={false}
-        style={{ height: "100%", width: "100%" }}
-      >
-        <TileLayer
-          attribution='&copy; <a href="https://www.openstreetmap.org/">OpenStreetMap</a>'
-          url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-        />
-        <Marker position={randomPlace.coords}>
-          <Popup>
-            <div className="p-2">
-              <strong>{randomPlace.name}</strong>
-              <p className="text-sm text-muted-foreground mt-1">
-                Popular location in {city}
-              </p>
-            </div>
-          </Popup>
-        </Marker>
-      </MapContainer>
+    <div className={`w-full rounded-xl overflow-hidden bg-muted/50 ${className}`}>
+      <iframe
+        width="100%"
+        height="100%"
+        frameBorder="0"
+        scrolling="no"
+        marginHeight={0}
+        marginWidth={0}
+        src={mapUrl}
+        style={{ border: 0, minHeight: '400px' }}
+        title={`Map of ${randomPlace.name}`}
+      />
+      <div className="p-4 bg-background/95 backdrop-blur">
+        <div className="flex items-center gap-2">
+          <MapPin className="h-5 w-5 text-primary" />
+          <div>
+            <p className="font-semibold">{randomPlace.name}</p>
+            <p className="text-sm text-muted-foreground">Popular location in {city}</p>
+          </div>
+        </div>
+      </div>
     </div>
   );
 };
