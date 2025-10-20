@@ -301,11 +301,121 @@ const PropertyDetail = () => {
 
             {/* Property Description */}
             <Card>
-              <CardContent className="p-6">
-                <h3 className="font-semibold mb-4 text-lg">About This Property</h3>
-                <p className="text-muted-foreground leading-relaxed">
-                  {property.description || 'This is a beautiful property located in a prime area with excellent connectivity and amenities. Perfect for families looking for a comfortable and modern living space.'}
-                </p>
+              <CardContent className="p-6 space-y-6">
+                <div>
+                  <h3 className="font-semibold mb-4 text-xl">About This Property</h3>
+                  <p className="text-muted-foreground leading-relaxed">
+                    {property.description || 'This is a beautiful property located in a prime area with excellent connectivity and amenities. Perfect for families looking for a comfortable and modern living space.'}
+                  </p>
+                </div>
+
+                {/* Key Highlights */}
+                <div>
+                  <h4 className="font-semibold mb-3 text-lg">Key Highlights</h4>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                    <div className="flex items-start gap-3 p-3 rounded-lg bg-muted/50">
+                      <div className="w-2 h-2 rounded-full bg-primary mt-2" />
+                      <div>
+                        <p className="font-medium">Prime Location</p>
+                        <p className="text-sm text-muted-foreground">Excellent connectivity to major landmarks and business districts</p>
+                      </div>
+                    </div>
+                    <div className="flex items-start gap-3 p-3 rounded-lg bg-muted/50">
+                      <div className="w-2 h-2 rounded-full bg-primary mt-2" />
+                      <div>
+                        <p className="font-medium">Modern Amenities</p>
+                        <p className="text-sm text-muted-foreground">State-of-the-art facilities for comfortable living</p>
+                      </div>
+                    </div>
+                    <div className="flex items-start gap-3 p-3 rounded-lg bg-muted/50">
+                      <div className="w-2 h-2 rounded-full bg-primary mt-2" />
+                      <div>
+                        <p className="font-medium">Investment Value</p>
+                        <p className="text-sm text-muted-foreground">High appreciation potential in this growing area</p>
+                      </div>
+                    </div>
+                    <div className="flex items-start gap-3 p-3 rounded-lg bg-muted/50">
+                      <div className="w-2 h-2 rounded-full bg-primary mt-2" />
+                      <div>
+                        <p className="font-medium">Ready to Move</p>
+                        <p className="text-sm text-muted-foreground">Immediate possession available for your convenience</p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Nearby Amenities */}
+                <div>
+                  <h4 className="font-semibold mb-3 text-lg">Nearby Amenities</h4>
+                  <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                    <div className="text-center p-3 rounded-lg border">
+                      <div className="text-2xl mb-2">🏫</div>
+                      <p className="text-sm font-medium">Schools</p>
+                      <p className="text-xs text-muted-foreground">Within 2 km</p>
+                    </div>
+                    <div className="text-center p-3 rounded-lg border">
+                      <div className="text-2xl mb-2">🏥</div>
+                      <p className="text-sm font-medium">Hospitals</p>
+                      <p className="text-xs text-muted-foreground">Within 3 km</p>
+                    </div>
+                    <div className="text-center p-3 rounded-lg border">
+                      <div className="text-2xl mb-2">🛒</div>
+                      <p className="text-sm font-medium">Shopping</p>
+                      <p className="text-xs text-muted-foreground">Within 1 km</p>
+                    </div>
+                    <div className="text-center p-3 rounded-lg border">
+                      <div className="text-2xl mb-2">🚇</div>
+                      <p className="text-sm font-medium">Metro</p>
+                      <p className="text-xs text-muted-foreground">Within 1.5 km</p>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Why Choose This Property */}
+                <div>
+                  <h4 className="font-semibold mb-3 text-lg">Why Choose This Property?</h4>
+                  <div className="space-y-3">
+                    <div className="flex items-start gap-3">
+                      <div className="w-6 h-6 rounded-full bg-primary/10 flex items-center justify-center flex-shrink-0 mt-1">
+                        <span className="text-primary text-sm">✓</span>
+                      </div>
+                      <p className="text-muted-foreground">
+                        <span className="font-medium text-foreground">Strategic Location:</span> Situated in one of the most sought-after neighborhoods with seamless access to schools, hospitals, and entertainment hubs.
+                      </p>
+                    </div>
+                    <div className="flex items-start gap-3">
+                      <div className="w-6 h-6 rounded-full bg-primary/10 flex items-center justify-center flex-shrink-0 mt-1">
+                        <span className="text-primary text-sm">✓</span>
+                      </div>
+                      <p className="text-muted-foreground">
+                        <span className="font-medium text-foreground">Quality Construction:</span> Built with premium materials and attention to detail, ensuring durability and aesthetic appeal for years to come.
+                      </p>
+                    </div>
+                    <div className="flex items-start gap-3">
+                      <div className="w-6 h-6 rounded-full bg-primary/10 flex items-center justify-center flex-shrink-0 mt-1">
+                        <span className="text-primary text-sm">✓</span>
+                      </div>
+                      <p className="text-muted-foreground">
+                        <span className="font-medium text-foreground">Lifestyle Benefits:</span> Enjoy a perfect blend of comfort and convenience with modern amenities designed for contemporary living.
+                      </p>
+                    </div>
+                    <div className="flex items-start gap-3">
+                      <div className="w-6 h-6 rounded-full bg-primary/10 flex items-center justify-center flex-shrink-0 mt-1">
+                        <span className="text-primary text-sm">✓</span>
+                      </div>
+                      <p className="text-muted-foreground">
+                        <span className="font-medium text-foreground">Investment Opportunity:</span> Exceptional growth potential in this rapidly developing area makes it an ideal investment for your future.
+                      </p>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Call to Action */}
+                <div className="bg-primary/5 p-4 rounded-lg border border-primary/20">
+                  <p className="text-sm text-center">
+                    <span className="font-semibold text-foreground">Don&apos;t miss this opportunity!</span> This property offers exceptional value and won&apos;t be available for long. Schedule a visit today to experience it firsthand.
+                  </p>
+                </div>
               </CardContent>
             </Card>
           </div>
