@@ -26,6 +26,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
 import { useToast } from '@/hooks/use-toast';
 import BookVisit from '@/components/booking/BookVisit';
+import CityMap from '@/components/maps/CityMap';
 
 interface Property {
   id: string;
@@ -290,6 +291,13 @@ const PropertyDetail = () => {
                 ))}
               </div>
             )}
+
+            {/* City Map */}
+            <Card>
+              <CardContent className="p-0">
+                <CityMap city={property.city} className="h-[400px]" />
+              </CardContent>
+            </Card>
 
             {/* Property Description */}
             <Card>
